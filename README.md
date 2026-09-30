@@ -65,6 +65,17 @@ Cloudflare Workers Builds 설정:
   | `football_articles` | 축구 칼럼 `/articles` (본문 HTML, `published = true` 인 글만 공개) | `supabase/seed/football_articles.sql` |
   | `football_glossary` | 축구 용어 사전 `/glossary` | `supabase/seed/football_glossary.sql` |
   | `football_team_profiles` | 팀 분석 화면의 구단 소개 | `supabase/seed/football_team_profiles_*.sql` |
+- 해외파 한국 선수(`/korean-players`, `/player/{id}`): 소개글은 `football_player_profiles`(초기 데이터 `supabase/seed/football_player_profiles.sql`),
+  소속팀·포지션은 선수단 수집 데이터에서 읽습니다. 소개글이 있는 선수만 페이지가 만들어집니다.
+- 팀 한글 이름은 `football_teams.name_ko`, `short_name_ko` 에 있습니다(`supabase/seed/football_team_names.sql`). 새 팀이 수집되면 여기에 추가해 주세요. 비어 있으면 영어 이름을 씁니다.
+- 날짜별 해외축구 일정(`/schedule`, `/schedule/{YYYY-MM-DD}`): 모든 대회 경기를 한국시간 날짜로 묶어 보여줍니다.
+- 추가 리그: 챔피언십(ELC), 에레디비시(DED), 프리메이라리가(PPL), 브라질 세리에 A(BSA)는 20분마다 수집합니다(`/leagues`).
+- 역대 맞대결(`/h2h/{작은팀id}-{큰팀id}`): Edge Function `action: "h2h"` 가 10분마다 앞으로 10일 안의 경기 2개씩
+  football-data.org head2head 를 받아 `football_h2h` 에 저장합니다. 화면은 이 테이블만 읽습니다.
+- 시즌 기록실(`/archive`, `/archive/{리그}/{시즌}`): API-Football 무료 플랜(2022~2024 시즌)으로 5대 리그와 K리그1의 최종 순위·득점 순위를
+  `football_archive_standings` 에 저장합니다. 득점 순위는 API-Football 값에 오류가 있어 football-data.org 지난 시즌 기록(`fd_scorers`)을 `football_archive_scorers` 에 저장하고, K리그1 득점 순위는 싣지 않습니다. 받아올 목록은 `football_archive_queue` 이고,
+  pg_cron `football-archive-tick` 이 1분마다 8개씩 보내고 응답을 저장합니다(무료 플랜은 분당 10회·하루 100회).
+  키는 Vault `api_football_key`. 새 시즌을 받으려면 큐에 행을 넣으면 됩니다. 팀 한글 이름은 `football_archive_team_names`.
 - 경기 데이터로 자동 생성하는 분석 페이지: 5대 리그 통계 비교(`/stats`), 리그별 시즌 통계(`/{리그}/stats`),
   라운드 리뷰(`/{리그}/round/{n}`, 모든 경기가 끝난 라운드만). 계산은 `lib/insights.ts`, 문장은 `lib/narrative.ts` 에 있습니다.
 - 승인 후 게시자 ID 를 `.env.production` 에 넣으면 광고 스크립트와 `/ads.txt` 가 켜집니다.

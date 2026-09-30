@@ -5,6 +5,8 @@
  *   리그 정보, 팀, 현재 시즌 전체 경기, 순위표, 득점 순위를 upsert 한다. (API 호출 3회)
  * POST { action: "squads", limit: 5 }
  *   선수단을 가장 오래전에 받아온 팀부터 limit 개 받아온다. (팀당 API 호출 1회)
+ * POST { action: "h2h", limit: 2 }
+ *   앞으로 10일 안의 경기 가운데 맞대결을 아직 받지 않은 경기 limit 개의 역대 맞대결을 받아온다. (경기당 API 호출 1회)
  * 헤더 x-sync-token 이 Vault 의 football_sync_token 과 같아야 한다.
  *
  * API 토큰은 Vault(football_data_token)에 있고 service_role 전용 함수 football_sync_config() 로 읽는다.
@@ -13,7 +15,7 @@
 import { createClient } from "jsr:@supabase/supabase-js@2";
 
 const API = "https://api.football-data.org/v4";
-const COMPETITIONS = ["PL", "PD", "BL1", "SA", "FL1", "CL", "WC"];
+const COMPETITIONS = ["PL", "PD", "BL1", "SA", "FL1", "CL", "WC", "ELC", "DED", "PPL", "BSA"];
 
 const supabase = createClient(Deno.env.get("SUPABASE_URL")!, Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!, {
   auth: { persistSession: false },
@@ -299,8 +301,18 @@ async function syncSquads(limit: number, token: string) {
   if (error) throw new Error(`팀 목록 조회 실패: ${error.message}`);
 
   const done: Array<{ id: number; players: number }> = [];
+  const skipped: number[] = [];
   for (const { id } of targets ?? []) {
-    const t = await api<ApiTeamDetail>(`/teams/${id}`, token);
+    let t: ApiTeamDetail;
+    try {
+      t = await api<ApiTeamDetail>(`/teams/${id}`, token);
+    } catch (e) {
+      // 무료 플랜 권한 밖의 팀(403)은 하루 동안 건너뛴다. 그러지 않으면 같은 팀에서 계속 멈춘다.
+      if (!(e instanceof Error) || !e.message.includes("(403)")) throw e;
+      await supabase.from("football_teams").update({ squad_synced_at: new Date().toISOString() }).eq("id", id);
+      skipped.push(id);
+      continue;
+    }
     const now = new Date().toISOString();
     const { error: teamError } = await supabase
       .from("football_teams")
@@ -337,7 +349,81 @@ async function syncSquads(limit: number, token: string) {
     matches: done.length,
     standings: done.reduce((n, d) => n + d.players, 0),
   });
-  return { squads: done };
+  return { squads: done, skipped };
+}
+
+interface ApiHead2Head {
+  matches: Array<ApiMatch & { competition?: { code: string | null } }>;
+}
+
+// 다가오는 경기의 역대 맞대결. 무료 플랜은 무료 대회 경기만 돌려주므로 목록으로 직접 성적을 센다.
+async function syncH2h(limit: number, token: string) {
+  const now = new Date();
+  const until = new Date(now.getTime() + 10 * 24 * 3600 * 1000);
+  const { data: upcoming, error } = await supabase
+    .from("football_matches")
+    .select("id, home_team_id, away_team_id")
+    .in("status", ["SCHEDULED", "TIMED"])
+    .gte("utc_date", now.toISOString())
+    .lte("utc_date", until.toISOString())
+    .not("home_team_id", "is", null)
+    .not("away_team_id", "is", null)
+    .order("utc_date")
+    .limit(300);
+  if (error) throw new Error(`경기 목록 조회 실패: ${error.message}`);
+  const ids = (upcoming ?? []).map((m) => m.id);
+  const { data: have, error: haveError } = await supabase.from("football_h2h").select("match_id").in("match_id", ids);
+  if (haveError) throw new Error(`맞대결 조회 실패: ${haveError.message}`);
+  const done = new Set((have ?? []).map((h) => h.match_id));
+  const targets = (upcoming ?? []).filter((m) => !done.has(m.id)).slice(0, limit);
+
+  const saved: number[] = [];
+  for (const t of targets) {
+    const res = await api<ApiHead2Head>(`/matches/${t.id}/head2head?limit=10`, token);
+    const past = (res.matches ?? []).filter((m) => m.id !== t.id && m.status === "FINISHED");
+    let homeWins = 0;
+    let draws = 0;
+    let awayWins = 0;
+    let goals = 0;
+    for (const m of past) {
+      const h = m.score.fullTime.home ?? 0;
+      const a = m.score.fullTime.away ?? 0;
+      goals += h + a;
+      const winnerId = h > a ? m.homeTeam.id : h < a ? m.awayTeam.id : null;
+      if (winnerId === null) draws++;
+      else if (winnerId === t.home_team_id) homeWins++;
+      else awayWins++;
+    }
+    const { error: saveError } = await supabase.from("football_h2h").upsert(
+      {
+        match_id: t.id,
+        home_team_id: t.home_team_id,
+        away_team_id: t.away_team_id,
+        number_of_matches: past.length,
+        total_goals: goals,
+        home_wins: homeWins,
+        draws,
+        away_wins: awayWins,
+        matches: past.map((m) => ({
+          id: m.id,
+          utcDate: m.utcDate,
+          competition: m.competition?.code ?? null,
+          homeTeamId: m.homeTeam.id,
+          awayTeamId: m.awayTeam.id,
+          homeName: m.homeTeam.shortName ?? m.homeTeam.name,
+          awayName: m.awayTeam.shortName ?? m.awayTeam.name,
+          home: m.score.fullTime.home,
+          away: m.score.fullTime.away,
+        })),
+        fetched_at: new Date().toISOString(),
+      },
+      { onConflict: "match_id" },
+    );
+    if (saveError) throw new Error(`맞대결 저장 실패: ${saveError.message}`);
+    saved.push(t.id);
+  }
+  await supabase.from("football_sync_log").insert({ competition_code: "H2H", matches: saved.length, standings: 0 });
+  return { h2h: saved };
 }
 
 Deno.serve(async (req) => {
@@ -350,6 +436,10 @@ Deno.serve(async (req) => {
     if (body.action === "squads") {
       code = "SQUADS";
       return json(await syncSquads(Math.min(8, Math.max(1, Number(body.limit) || 5)), cfg.api_token));
+    }
+    if (body.action === "h2h") {
+      code = "H2H";
+      return json(await syncH2h(Math.min(4, Math.max(1, Number(body.limit) || 2)), cfg.api_token));
     }
     code = body.competition?.toUpperCase();
     if (!code || !COMPETITIONS.includes(code)) return json({ error: `competition 은 ${COMPETITIONS.join(" | ")}` }, 400);

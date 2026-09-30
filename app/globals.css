@@ -438,6 +438,8 @@ table.standings {
 .z-rel { --zone: var(--z-rel); }
 .z-ko { --zone: var(--z-ko); }
 .z-out { --zone: var(--z-out); }
+.z-promo { --zone: var(--z-ucl); }
+.z-promoPlayoff { --zone: var(--z-uecl); }
 
 .legend {
   display: flex;
@@ -661,6 +663,15 @@ table.standings {
   font-weight: 900;
   letter-spacing: -0.045em;
   line-height: 1.15;
+}
+
+.team-head h2 small {
+  display: block;
+  margin-top: 2px;
+  font-size: 13px;
+  font-weight: 600;
+  letter-spacing: 0;
+  color: var(--ink-3);
 }
 
 .team-record {
@@ -1281,6 +1292,148 @@ table.standings {
   padding: 2px 8px;
   border: 1px solid var(--line);
   background: var(--surface);
+}
+
+/* ── 한국 선수 · 일정 ─────────────────────────── */
+
+.crumbs-bar {
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--ink-3);
+  margin-bottom: 12px;
+}
+
+.crumbs-bar a {
+  color: var(--ink-2);
+}
+
+.player-name {
+  font-size: 28px;
+  font-weight: 900;
+  letter-spacing: -0.045em;
+  line-height: 1.15;
+}
+
+.player-name small {
+  display: block;
+  margin-top: 2px;
+  font-size: 13px;
+  font-weight: 600;
+  letter-spacing: 0;
+  color: var(--ink-3);
+}
+
+.team-record a b {
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+
+.ko-tag {
+  font-style: normal;
+  color: var(--z-ucl);
+  border-color: var(--z-ucl);
+}
+
+.facts .ko-tag {
+  margin-left: 6px;
+  font-size: 12px;
+  font-weight: 700;
+}
+
+.player-link strong {
+  font-weight: 800;
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+
+.day-title {
+  font-size: 26px !important;
+}
+
+.prose .sr-title {
+  font-size: 20px;
+  margin-bottom: 8px;
+}
+
+.prose h2 a {
+  color: inherit;
+}
+
+.home-links {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 12px;
+  margin-top: 24px;
+}
+
+.home-links .review-link {
+  margin-bottom: 0;
+}
+
+@media (max-width: 640px) {
+  .home-links {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}
+
+.league-card h2 {
+  display: flex;
+  align-items: baseline;
+  gap: 10px;
+}
+
+.league-card h2 a {
+  color: inherit;
+  text-decoration: none;
+}
+
+.league-card h2 small {
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--ink-3);
+}
+
+.other-leagues {
+  margin-top: 16px;
+}
+
+.h2h-link {
+  display: inline-block;
+  margin: 2px 0 8px;
+  font-size: 12px;
+  font-weight: 700;
+  color: var(--z-ucl);
+}
+
+.h2h-head {
+  display: grid;
+  grid-template-columns: 1fr auto 1fr;
+  align-items: center;
+  gap: 16px;
+  margin-bottom: 24px;
+  padding: 20px;
+  background: var(--surface);
+  border-top: 3px solid var(--rule);
+}
+
+.h2h-team {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+  text-align: center;
+}
+
+.h2h-team strong {
+  font-size: 18px;
+  font-weight: 900;
+  letter-spacing: -0.03em;
+}
+
+.h2h-vs {
+  font-size: 20px;
+  font-weight: 900;
+  color: var(--ink-3);
 }
 
 /* ── 홈 ─────────────────────────── */

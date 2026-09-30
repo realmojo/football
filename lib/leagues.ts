@@ -61,6 +61,46 @@ export const LEAGUES = [
     ],
   },
   {
+    code: "ELC",
+    kind: "league",
+    name: "챔피언십",
+    country: "잉글랜드 2부",
+    intro: [
+      "챔피언십은 프리미어리그 바로 아래의 잉글랜드 2부 리그로, 24개 팀이 팀당 46경기를 치르는 긴 레이스입니다. 주중과 주말을 가리지 않고 경기가 이어져 체력과 선수단 깊이가 순위를 크게 좌우합니다.",
+      "1위와 2위는 프리미어리그로 곧바로 승격하고, 3위부터 6위까지는 승격 플레이오프를 치러 마지막 한 자리를 가립니다. 준결승은 홈·원정 두 경기, 결승은 웸블리에서 단판으로 열리며, 승격에 따른 중계권 수입이 워낙 커서 \"세계에서 가장 비싼 경기\"라고 불립니다. 22위부터 24위까지는 3부 리그인 리그 원으로 강등됩니다.",
+    ],
+  },
+  {
+    code: "DED",
+    kind: "league",
+    name: "에레디비시",
+    country: "네덜란드",
+    intro: [
+      "에레디비시는 네덜란드 1부 리그로, 18개 팀이 팀당 34경기를 치릅니다. 아약스, PSV, 페예노르트가 오랫동안 우승을 나눠 가진 리그로, 뛰어난 유소년 육성과 공격적인 축구로 유명합니다. 많은 유망주가 이 리그를 거쳐 빅리그로 이적합니다.",
+      "상위 팀들은 순위에 따라 유럽대항전에 나가며, 일부 진출권은 시즌 뒤 따로 치르는 플레이오프로 주인을 가립니다. 17위와 18위는 2부 리그로 강등되고, 16위는 2부 리그 상위 팀들과 승강 플레이오프를 치릅니다.",
+    ],
+  },
+  {
+    code: "PPL",
+    kind: "league",
+    name: "프리메이라리가",
+    country: "포르투갈",
+    intro: [
+      "프리메이라리가는 포르투갈 1부 리그로, 18개 팀이 팀당 34경기를 치릅니다. 벤피카, 포르투, 스포르팅 CP 세 구단이 거의 모든 우승을 나눠 가져 \"빅3\"로 불리며, 브라가가 그 뒤를 추격하는 구도가 이어져 왔습니다.",
+      "남미와 아프리카의 유망주를 데려와 키운 뒤 유럽 빅리그로 보내는 \"선수 시장\" 역할로 유명합니다. 17위와 18위는 2부 리그로 강등되고, 16위는 2부 리그 3위 팀과 승강 플레이오프를 치릅니다.",
+    ],
+  },
+  {
+    code: "BSA",
+    kind: "league",
+    name: "브라질 세리에 A",
+    country: "브라질",
+    intro: [
+      "브라질 세리에 A(브라질레이랑)는 20개 팀이 팀당 38경기를 치르는 브라질 1부 리그입니다. 유럽 리그와 달리 한 해 안에 시즌이 시작하고 끝나서, 유럽이 쉬는 여름에도 경기를 볼 수 있습니다. 플라멩구, 팔메이라스, 코린치앙스 등 인기 구단이 많고 우승 팀이 자주 바뀌는 치열한 리그입니다.",
+      "상위 팀들은 남미 최고 클럽 대항전인 코파 리베르타도레스에 나가고, 17위부터 20위까지 네 팀은 2부 리그로 강등됩니다. 강등 팀이 네 개나 되는 만큼 하위권 싸움이 유럽 리그보다 훨씬 치열합니다.",
+    ],
+  },
+  {
     code: "WC",
     kind: "cup",
     name: "월드컵",
@@ -84,12 +124,15 @@ export function findLeague(code: string) {
   return LEAGUES.find((l) => l.code === code.toUpperCase());
 }
 
+// 엠블럼 파일 이름이 대회 코드와 다른 경우
+const EMBLEM_FILE: Record<string, string> = { DED: "ED", BSA: "bsa", KL1: "" };
+
 export function leagueEmblem(code: string) {
-  return `https://crests.football-data.org/${code}.png`;
+  return `https://crests.football-data.org/${EMBLEM_FILE[code] ?? code}.png`;
 }
 
 // 순위표 구간 표시 (유럽대항전 진출 / 강등권). 전체 순위표에만 표시한다.
-export type Zone = "ucl" | "uel" | "uecl" | "playoff" | "rel" | "ko" | "out";
+export type Zone = "ucl" | "uel" | "uecl" | "playoff" | "rel" | "ko" | "out" | "promo" | "promoPlayoff";
 
 export const ZONE_LABEL: Record<Zone, string> = {
   ucl: "챔피언스리그",
@@ -99,6 +142,8 @@ export const ZONE_LABEL: Record<Zone, string> = {
   rel: "강등",
   ko: "16강 직행",
   out: "탈락",
+  promo: "자동 승격",
+  promoPlayoff: "승격 플레이오프",
 };
 
 const ZONES: Record<string, Array<[from: number, to: number, zone: Zone]>> = {
@@ -108,6 +153,10 @@ const ZONES: Record<string, Array<[from: number, to: number, zone: Zone]>> = {
   BL1: [[1, 4, "ucl"], [5, 5, "uel"], [6, 6, "uecl"], [16, 16, "playoff"], [17, 18, "rel"]],
   FL1: [[1, 4, "ucl"], [5, 5, "uel"], [6, 6, "uecl"], [16, 16, "playoff"], [17, 18, "rel"]],
   CL: [[1, 8, "ko"], [9, 24, "playoff"], [25, 36, "out"]],
+  ELC: [[1, 2, "promo"], [3, 6, "promoPlayoff"], [22, 24, "rel"]],
+  DED: [[16, 16, "playoff"], [17, 18, "rel"]],
+  PPL: [[16, 16, "playoff"], [17, 18, "rel"]],
+  BSA: [[17, 20, "rel"]],
 };
 
 export function zoneFor(code: string, position: number): Zone | null {
@@ -143,3 +192,7 @@ export function groupLabel(group: string | null | undefined) {
 
 // 5대 리그 (컵대회·챔피언스리그 제외). 리그 간 비교 통계에 쓴다.
 export const DOMESTIC_LEAGUES = LEAGUES.filter((l) => ["PL", "PD", "BL1", "SA", "FL1"].includes(l.code));
+
+// 상단 메뉴에 보여줄 대회. 나머지 리그는 /leagues 에서 고른다.
+export const NAV_LEAGUES = LEAGUES.filter((l) => ["PL", "PD", "BL1", "SA", "FL1", "CL", "WC"].includes(l.code));
+export const OTHER_LEAGUES = LEAGUES.filter((l) => ["ELC", "DED", "PPL", "BSA"].includes(l.code));

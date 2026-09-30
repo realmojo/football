@@ -2,6 +2,8 @@ export interface Team {
   id: number;
   name: string;
   shortName: string;
+  // 원래 영어 이름 (검색·메타데이터용)
+  englishName?: string;
   tla: string;
   crest: string;
 }
@@ -55,6 +57,8 @@ export interface Score {
 
 export interface Match {
   id: number;
+  // 여러 대회 경기를 한데 모을 때 붙이는 대회 코드
+  competition?: string;
   utcDate: string;
   status: MatchStatus;
   matchday: number | null;

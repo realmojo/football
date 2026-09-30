@@ -5,7 +5,7 @@ import { TeamLabel } from "@/components/TeamLabel";
 import { isFinished, isUpcoming } from "@/lib/analysis";
 import { getArticles, getSeasonMatches, getStandings } from "@/lib/data";
 import { finalMatch, winnerOf } from "@/lib/cup";
-import { isCup, LEAGUES, leagueEmblem } from "@/lib/leagues";
+import { DOMESTIC_LEAGUES, isCup, LEAGUES, leagueEmblem, OTHER_LEAGUES } from "@/lib/leagues";
 import type { Match, StandingsResponse } from "@/lib/types";
 
 // 수집된 최신 데이터를 보여주기 위해 요청마다 렌더링한다.
@@ -29,12 +29,14 @@ export default async function HomePage() {
 
   const articles = await getArticles(4).catch(() => []);
 
-  const leagueResults = results.filter((r) => !isCup(r.league));
+  // 홈 순위표는 5대 리그만, 경기 목록은 모든 리그에서 고른다.
+  const leagueResults = results.filter((r) => DOMESTIC_LEAGUES.some((l) => l.code === r.league.code));
+  const taggedResults = results.filter((r) => !isCup(r.league));
   const worldCup = results.find((r) => r.league.code === "WC");
   const wcFinal = worldCup ? finalMatch(worldCup.matches) : null;
   const wcChampion = wcFinal && wcFinal.status === "FINISHED" ? winnerOf(wcFinal) : null;
 
-  const tagged = leagueResults.flatMap((r) => r.matches.map((m) => ({ match: m, league: r.league })));
+  const tagged = taggedResults.flatMap((r) => r.matches.map((m) => ({ match: m, league: r.league })));
   const upcoming = tagged
     .filter((t) => isUpcoming(t.match))
     .sort((a, b) => a.match.utcDate.localeCompare(b.match.utcDate))
@@ -79,6 +81,14 @@ export default async function HomePage() {
               <MiniTable key={league.code} code={league.code} name={league.name} standings={standings} />
             ))}
           </div>
+          <nav className="round-links other-leagues">
+            {OTHER_LEAGUES.map((l) => (
+              <a key={l.code} href={`/${l.code}`}>
+                {l.name} 순위
+              </a>
+            ))}
+            <a href="/leagues">전체 리그 보기 →</a>
+          </nav>
         </section>
 
         <aside className="rail">
@@ -105,6 +115,17 @@ export default async function HomePage() {
           </ul>
         </section>
       ) : null}
+
+      <section className="home-links">
+        <a href="/schedule" className="review-link">
+          <strong>오늘 해외축구 일정</strong>
+          <span>한국시간으로 정리한 오늘과 이번 주 경기 →</span>
+        </a>
+        <a href="/korean-players" className="review-link">
+          <strong>해외파 한국 선수</strong>
+          <span>김민재 · 이강인 · 황희찬 소속팀 일정과 기록 →</span>
+        </a>
+      </section>
 
       <section className="home-about">
         <h2>토리코리 활용법</h2>

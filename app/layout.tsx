@@ -72,6 +72,10 @@ gtag('config', 'G-XZ0HSLNP7B');`,
               </a>
               <nav className="footer-nav">
                 <a href="/about">사이트 소개</a>
+                <a href="/schedule">해외축구 일정</a>
+                <a href="/korean-players">해외파 한국 선수</a>
+                <a href="/leagues">전체 리그</a>
+                <a href="/archive">시즌 기록실</a>
                 <a href="/articles">축구 칼럼</a>
                 <a href="/stats">5대 리그 통계</a>
                 <a href="/glossary">축구 용어 사전</a>
