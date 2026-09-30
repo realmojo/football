@@ -1,6 +1,6 @@
 import type { MetadataRoute } from "next";
-import { getStandings } from "@/lib/data";
-import { LEAGUES } from "@/lib/leagues";
+import { getSeasonMatches, getStandings } from "@/lib/data";
+import { isCup, LEAGUES } from "@/lib/leagues";
 import { SITE_URL } from "@/lib/site";
 
 // 수집된 최신 데이터를 보여주기 위해 요청마다 렌더링한다.
@@ -24,8 +24,15 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
       { url: `${SITE_URL}/${l.code}/matches`, lastModified: now, changeFrequency: "hourly", priority: 0.8 },
       { url: `${SITE_URL}/${l.code}/scorers`, lastModified: now, changeFrequency: "hourly", priority: 0.8 },
     );
-    const standings = await getStandings(l.code).catch(() => null);
-    const teamIds = new Set(standings?.standings.flatMap((s) => s.table.map((r) => r.team.id)) ?? []);
+    let teamIds: Set<number>;
+    if (isCup(l)) {
+      pages.push({ url: `${SITE_URL}/${l.code}/bracket`, lastModified: now, changeFrequency: "daily", priority: 0.8 });
+      const matches = await getSeasonMatches(l.code).catch(() => []);
+      teamIds = new Set(matches.flatMap((m) => [m.homeTeam.id, m.awayTeam.id]));
+    } else {
+      const standings = await getStandings(l.code).catch(() => null);
+      teamIds = new Set(standings?.standings.flatMap((s) => s.table.map((r) => r.team.id)) ?? []);
+    }
     for (const id of teamIds) {
       pages.push({ url: `${SITE_URL}/${l.code}/team/${id}`, lastModified: now, changeFrequency: "daily", priority: 0.6 });
     }

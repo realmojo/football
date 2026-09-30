@@ -128,7 +128,26 @@ const COUNTRIES: Record<string, string> = {
   Iran: "이란",
   "Saudi Arabia": "사우디아라비아",
   Uzbekistan: "우즈베키스탄",
+  "Bosnia-Herzegovina": "보스니아 헤르체고비나",
+  "Cape Verde Islands": "카보베르데",
+  "Cape Verde": "카보베르데",
+  Curaçao: "퀴라소",
+  Haiti: "아이티",
+  Iraq: "이라크",
+  Jordan: "요르단",
+  Panama: "파나마",
+  Qatar: "카타르",
+  "Costa Rica": "코스타리카",
+  Honduras: "온두라스",
+  Bolivia: "볼리비아",
+  "United Arab Emirates": "아랍에미리트",
+  Oman: "오만",
 };
+
+// 대표팀 이름(영문 국가명)이면 한글 이름을, 아니면 null 을 돌려준다.
+export function nationName(name: string) {
+  return COUNTRIES[name] ?? null;
+}
 
 export function countryLabel(country: string | null) {
   if (!country) return "-";

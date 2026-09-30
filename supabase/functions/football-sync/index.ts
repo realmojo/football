@@ -13,7 +13,7 @@
 import { createClient } from "jsr:@supabase/supabase-js@2";
 
 const API = "https://api.football-data.org/v4";
-const COMPETITIONS = ["PL", "PD", "BL1", "SA", "FL1", "CL"];
+const COMPETITIONS = ["PL", "PD", "BL1", "SA", "FL1", "CL", "WC"];
 
 const supabase = createClient(Deno.env.get("SUPABASE_URL")!, Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!, {
   auth: { persistSession: false },
@@ -53,9 +53,18 @@ interface ApiMatch {
   awayTeam: ApiTeam;
   score: {
     winner: string | null;
+    duration?: string | null;
     fullTime: { home: number | null; away: number | null };
     halfTime: { home: number | null; away: number | null };
+    regularTime?: { home: number | null; away: number | null };
+    extraTime?: { home: number | null; away: number | null };
+    penalties?: { home: number | null; away: number | null };
   };
+}
+
+interface ApiMatches {
+  competition: { id: number; name: string; code: string; emblem: string | null };
+  matches: ApiMatch[];
 }
 
 interface ApiStandings {
@@ -119,9 +128,23 @@ async function upsert(table: string, rows: Record<string, unknown>[], onConflict
   }
 }
 
+// 월드컵처럼 순위표를 주지 않는 대회는 404 가 나온다. 그때는 경기 목록에서 대회 정보를 만든다.
+async function getStandings(code: string, token: string, fallback: () => Promise<ApiMatches>): Promise<ApiStandings> {
+  try {
+    return await api<ApiStandings>(`/competitions/${code}/standings`, token);
+  } catch (e) {
+    if (!(e instanceof Error) || !e.message.includes("(404)")) throw e;
+    const { competition, matches } = await fallback();
+    const season = (matches[0] as unknown as { season: ApiStandings["season"] }).season;
+    return { competition, season, standings: [] };
+  }
+}
+
 async function sync(code: string, token: string) {
-  const standings = await api<ApiStandings>(`/competitions/${code}/standings`, token);
-  const { matches } = await api<{ matches: ApiMatch[] }>(`/competitions/${code}/matches`, token);
+  let matchesResponse: ApiMatches | null = null;
+  const loadMatches = async () => (matchesResponse ??= await api<ApiMatches>(`/competitions/${code}/matches`, token));
+  const standings = await getStandings(code, token, loadMatches);
+  const { matches } = await loadMatches();
   const { scorers } = await api<ApiScorers>(`/competitions/${code}/scorers?limit=30`, token);
   const now = new Date().toISOString();
 
@@ -181,6 +204,13 @@ async function sync(code: string, token: string) {
     away_score: m.score.fullTime.away,
     home_half: m.score.halfTime.home,
     away_half: m.score.halfTime.away,
+    duration: m.score.duration ?? null,
+    home_regular: m.score.regularTime?.home ?? null,
+    away_regular: m.score.regularTime?.away ?? null,
+    home_extra: m.score.extraTime?.home ?? null,
+    away_extra: m.score.extraTime?.away ?? null,
+    home_pen: m.score.penalties?.home ?? null,
+    away_pen: m.score.penalties?.away ?? null,
     last_updated: m.lastUpdated,
     synced_at: now,
   }));

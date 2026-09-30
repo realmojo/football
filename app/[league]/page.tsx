@@ -2,10 +2,11 @@ import { ErrorBox } from "@/components/ErrorBox";
 import { FormString } from "@/components/Form";
 import { MatchRow } from "@/components/MatchRow";
 import { ScorerTable } from "@/components/ScorerTable";
+import { GroupStage } from "@/components/cup/GroupStage";
 import { TeamLabel } from "@/components/TeamLabel";
 import { computeTable, isFinished, isLive, isUpcoming, recentForm } from "@/lib/analysis";
 import { getScorers, getSeasonMatches, getStandings } from "@/lib/data";
-import { findLeague, ZONE_LABEL, zoneFor, zonesOf } from "@/lib/leagues";
+import { findLeague, isCup, ZONE_LABEL, zoneFor, zonesOf } from "@/lib/leagues";
 import type { Match, Standing, StandingsResponse } from "@/lib/types";
 
 const VIEWS = [
@@ -33,6 +34,20 @@ export default async function StandingsPage({
     getScorers(code),
   ]);
   const topScorers = scorersResult.status === "fulfilled" ? scorersResult.value.slice(0, 5) : [];
+
+  if (isCup(info)) {
+    if (matchesResult.status === "rejected") return <ErrorBox error={matchesResult.reason} />;
+    return (
+      <>
+        <GroupStage
+          matches={matchesResult.value}
+          scorers={scorersResult.status === "fulfilled" ? scorersResult.value : []}
+          league={code}
+        />
+        <LeagueIntro name={info.name} intro={info.intro} />
+      </>
+    );
+  }
 
   return (
     <div className="split">
@@ -62,15 +77,7 @@ export default async function StandingsPage({
           <ErrorBox error={standingsResult.reason} />
         )}
 
-        <div className="league-intro">
-          <h2>{info.name} 알아보기</h2>
-          {info.intro.map((p, i) => (
-            <p key={i}>{p}</p>
-          ))}
-          <p className="muted">
-            순위표 항목과 색 막대의 뜻은 <a href="/guide">이용 가이드</a>에서 자세히 볼 수 있습니다.
-          </p>
-        </div>
+        <LeagueIntro name={info.name} intro={info.intro} />
       </section>
 
       <aside className="rail">
@@ -227,5 +234,19 @@ function MatchesSummary({ matches, league }: { matches: Match[]; league: string 
         )}
       </div>
     </>
+  );
+}
+
+function LeagueIntro({ name, intro }: { name: string; intro: readonly string[] }) {
+  return (
+    <div className="league-intro">
+      <h2>{name} 알아보기</h2>
+      {intro.map((p, i) => (
+        <p key={i}>{p}</p>
+      ))}
+      <p className="muted">
+        순위표 항목과 색 막대의 뜻은 <a href="/guide">이용 가이드</a>에서 자세히 볼 수 있습니다.
+      </p>
+    </div>
   );
 }

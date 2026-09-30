@@ -7,7 +7,8 @@ import { MatchRow } from "@/components/MatchRow";
 import { analyzeTeam, headToHead, perGame, points, type Record } from "@/lib/analysis";
 import { getScorers, getSeasonMatches, getStandings, getTeamProfile } from "@/lib/data";
 import { age, countryLabel, POSITION_GROUP_LABEL, positionGroup, positionLabel, type PositionGroup } from "@/lib/labels";
-import { findLeague } from "@/lib/leagues";
+import { findLeague, groupLabel, isCup, stageLabel } from "@/lib/leagues";
+import { teamFinish } from "@/lib/cup";
 import type { Match, Player, Scorer, TableRow, TeamProfile } from "@/lib/types";
 
 export async function generateMetadata({
@@ -32,7 +33,9 @@ export async function generateMetadata({
 
 export default async function TeamPage({ params }: { params: Promise<{ league: string; teamId: string }> }) {
   const { league, teamId } = await params;
-  const code = findLeague(league)!.code;
+  const info = findLeague(league)!;
+  const code = info.code;
+  const cup = isCup(info);
   const id = Number(teamId);
 
   let matches: Match[];
@@ -86,6 +89,17 @@ export default async function TeamPage({ params }: { params: Promise<{ league: s
               </span>
             </p>
           ) : null}
+          {cup ? (
+            <p className="team-record">
+              <b>{teamFinish(matches, id) ?? "-"}</b>
+              <span>
+                {a.overall.won}승 {a.overall.draw}무 {a.overall.lost}패
+              </span>
+              <span>
+                {a.overall.goalsFor}득점 {a.overall.goalsAgainst}실점
+              </span>
+            </p>
+          ) : null}
         </div>
       </div>
 
@@ -99,6 +113,20 @@ export default async function TeamPage({ params }: { params: Promise<{ league: s
         <Stat label="양팀 득점" value={String(a.bttsCount)} sub={pct(a.bttsCount)} />
       </div>
 
+      {cup ? (
+        <div className="block">
+          <h3 className="block-title">대회 경기 기록</h3>
+          {matches
+            .filter((m) => m.homeTeam.id === id || m.awayTeam.id === id)
+            .sort((x, y) => x.utcDate.localeCompare(y.utcDate))
+            .map((m) => (
+              <div key={m.id} className="tagged">
+                <span className="tag">{m.stage === "GROUP_STAGE" ? `조별리그 ${groupLabel(m.group)}` : stageLabel(m.stage)}</span>
+                <MatchRow match={m} league={code} showDate />
+              </div>
+            ))}
+        </div>
+      ) : (
       <div className="cols">
         <div className="block">
           <h3 className="block-title">홈 / 원정 성적</h3>
@@ -136,6 +164,7 @@ export default async function TeamPage({ params }: { params: Promise<{ league: s
           ))}
         </div>
       </div>
+      )}
 
       {nextMatch && opponent && opponentAnalysis ? (
         <div className="block">

@@ -2,6 +2,7 @@
 export const LEAGUES = [
   {
     code: "PL",
+    kind: "league",
     name: "프리미어리그",
     country: "잉글랜드",
     intro: [
@@ -11,6 +12,7 @@ export const LEAGUES = [
   },
   {
     code: "PD",
+    kind: "league",
     name: "라리가",
     country: "스페인",
     intro: [
@@ -20,6 +22,7 @@ export const LEAGUES = [
   },
   {
     code: "BL1",
+    kind: "league",
     name: "분데스리가",
     country: "독일",
     intro: [
@@ -29,6 +32,7 @@ export const LEAGUES = [
   },
   {
     code: "SA",
+    kind: "league",
     name: "세리에 A",
     country: "이탈리아",
     intro: [
@@ -38,6 +42,7 @@ export const LEAGUES = [
   },
   {
     code: "FL1",
+    kind: "league",
     name: "리그 1",
     country: "프랑스",
     intro: [
@@ -47,6 +52,7 @@ export const LEAGUES = [
   },
   {
     code: "CL",
+    kind: "league",
     name: "챔피언스리그",
     country: "유럽",
     intro: [
@@ -54,9 +60,25 @@ export const LEAGUES = [
       "리그 페이즈에서 각 팀은 서로 다른 상대 8팀과 한 경기씩 치릅니다. 1위부터 8위까지는 16강에 바로 오르고, 9위부터 24위까지는 녹아웃 플레이오프를 거쳐 16강 진출을 다툽니다. 25위 아래 팀은 대회에서 탈락합니다. 이후 16강부터는 홈·원정 두 경기로 승부를 가리고, 결승은 단판으로 치릅니다.",
     ],
   },
+  {
+    code: "WC",
+    kind: "cup",
+    name: "월드컵",
+    country: "2026 북중미",
+    intro: [
+      "2026 FIFA 월드컵은 미국, 캐나다, 멕시코 세 나라가 함께 연 대회로, 2026년 6월 11일부터 7월 19일까지 열렸습니다. 이번 대회부터 참가국이 32개국에서 48개국으로 늘어나 전체 경기 수도 64경기에서 104경기가 되었습니다.",
+      "48개국은 4개 팀씩 12개 조로 나뉘어 조별리그를 치렀고, 각 조 1·2위 24개 팀과 조 3위 가운데 성적이 좋은 8개 팀이 32강 토너먼트에 올랐습니다. 32강부터는 단판 승부로, 90분 안에 승부가 나지 않으면 30분 연장전을 치르고 그래도 비기면 승부차기로 다음 라운드 진출 팀을 가렸습니다.",
+    ],
+  },
 ] as const;
 
 export type LeagueCode = (typeof LEAGUES)[number]["code"];
+
+export type League = (typeof LEAGUES)[number];
+
+export function isCup(league: { kind: string }) {
+  return league.kind === "cup";
+}
 
 export function findLeague(code: string) {
   return LEAGUES.find((l) => l.code === code.toUpperCase());
@@ -94,4 +116,27 @@ export function zoneFor(code: string, position: number): Zone | null {
 
 export function zonesOf(code: string): Zone[] {
   return [...new Set((ZONES[code] ?? []).map(([, , z]) => z))];
+}
+
+// 컵대회 단계. 경기 일정 탭 순서와 대진표 라운드 순서로 쓴다.
+export const CUP_STAGES = [
+  { key: "GS1", stage: "GROUP_STAGE", matchday: 1, label: "조별리그 1차전", short: "1차전" },
+  { key: "GS2", stage: "GROUP_STAGE", matchday: 2, label: "조별리그 2차전", short: "2차전" },
+  { key: "GS3", stage: "GROUP_STAGE", matchday: 3, label: "조별리그 3차전", short: "3차전" },
+  { key: "R32", stage: "LAST_32", label: "32강", short: "32강" },
+  { key: "R16", stage: "LAST_16", label: "16강", short: "16강" },
+  { key: "QF", stage: "QUARTER_FINALS", label: "8강", short: "8강" },
+  { key: "SF", stage: "SEMI_FINALS", label: "4강", short: "4강" },
+  { key: "3RD", stage: "THIRD_PLACE", label: "3·4위전", short: "3·4위전" },
+  { key: "F", stage: "FINAL", label: "결승", short: "결승" },
+] as const;
+
+export const KNOCKOUT_ROUNDS = ["LAST_32", "LAST_16", "QUARTER_FINALS", "SEMI_FINALS", "FINAL"] as const;
+
+export function stageLabel(stage: string) {
+  return CUP_STAGES.find((s) => s.stage === stage && s.stage !== "GROUP_STAGE")?.label ?? "조별리그";
+}
+
+export function groupLabel(group: string | null | undefined) {
+  return group?.startsWith("GROUP_") ? `${group.slice(6)}조` : "";
 }

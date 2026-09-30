@@ -4,7 +4,8 @@ import { MatchRow } from "@/components/MatchRow";
 import { TeamLabel } from "@/components/TeamLabel";
 import { isFinished, isUpcoming } from "@/lib/analysis";
 import { getSeasonMatches, getStandings } from "@/lib/data";
-import { LEAGUES, leagueEmblem } from "@/lib/leagues";
+import { finalMatch, winnerOf } from "@/lib/cup";
+import { isCup, LEAGUES, leagueEmblem } from "@/lib/leagues";
 import type { Match, StandingsResponse } from "@/lib/types";
 
 // 수집된 최신 데이터를 보여주기 위해 요청마다 렌더링한다.
@@ -26,7 +27,12 @@ export default async function HomePage() {
     }),
   );
 
-  const tagged = results.flatMap((r) => r.matches.map((m) => ({ match: m, league: r.league })));
+  const leagueResults = results.filter((r) => !isCup(r.league));
+  const worldCup = results.find((r) => r.league.code === "WC");
+  const wcFinal = worldCup ? finalMatch(worldCup.matches) : null;
+  const wcChampion = wcFinal && wcFinal.status === "FINISHED" ? winnerOf(wcFinal) : null;
+
+  const tagged = leagueResults.flatMap((r) => r.matches.map((m) => ({ match: m, league: r.league })));
   const upcoming = tagged
     .filter((t) => isUpcoming(t.match))
     .sort((a, b) => a.match.utcDate.localeCompare(b.match.utcDate))
@@ -47,13 +53,27 @@ export default async function HomePage() {
         </p>
       </section>
 
+      {wcFinal ? (
+        <a href="/WC" className="wc-banner">
+          <Crest src="https://crests.football-data.org/wm26.png" tla="WC" size={40} />
+          <div>
+            <span>2026 북중미 월드컵</span>
+            <strong>
+              {wcChampion ? `${wcChampion.name} 우승` : "월드컵"} · 결승 {wcFinal.homeTeam.name} {wcFinal.score.fullTime.home}-
+              {wcFinal.score.fullTime.away} {wcFinal.awayTeam.name}
+            </strong>
+          </div>
+          <em>조별리그 · 대진표 · 득점왕 보기 →</em>
+        </a>
+      ) : null}
+
       <div className="split">
         <section>
           <div className="sec-head">
             <h2>리그별 순위</h2>
           </div>
           <div className="league-grid">
-            {results.map(({ league, standings }) => (
+            {leagueResults.map(({ league, standings }) => (
               <MiniTable key={league.code} code={league.code} name={league.name} standings={standings} />
             ))}
           </div>

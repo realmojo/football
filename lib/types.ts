@@ -46,8 +46,11 @@ export type MatchStatus =
 
 export interface Score {
   winner: "HOME_TEAM" | "AWAY_TEAM" | "DRAW" | null;
+  // 연장까지의 스코어 (승부차기 골은 뺀 값)
   fullTime: { home: number | null; away: number | null };
   halfTime: { home: number | null; away: number | null };
+  duration?: "REGULAR" | "EXTRA_TIME" | "PENALTY_SHOOTOUT" | null;
+  penalties?: { home: number | null; away: number | null } | null;
 }
 
 export interface Match {
@@ -56,6 +59,7 @@ export interface Match {
   status: MatchStatus;
   matchday: number | null;
   stage: string;
+  group?: string | null;
   homeTeam: Team;
   awayTeam: Team;
   score: Score;

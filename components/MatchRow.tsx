@@ -9,9 +9,16 @@ export function MatchRow({ match, league, showDate = false }: { match: Match; le
   const { home, away } = match.score.fullTime;
   const winner = match.score.winner;
   const status = match.status === "TIMED" || match.status === "SCHEDULED" ? null : STATUS_LABEL[match.status];
+  const pens = match.score.penalties;
+  const note =
+    pens && pens.home != null
+      ? `승부차기 ${pens.home}-${pens.away}`
+      : match.score.duration === "EXTRA_TIME"
+        ? "연장"
+        : null;
 
   return (
-    <div className={`match${live ? " is-live" : ""}${done ? " is-done" : ""}`}>
+    <div className={`match${live ? " is-live" : ""}${done ? " is-done" : ""}${note ? " has-note" : ""}`}>
       <div className="match-when">
         {/* 예정 경기는 시간이 스코어 박스에 들어가므로 날짜만 표시한다 */}
         {showDate
@@ -31,6 +38,7 @@ export function MatchRow({ match, league, showDate = false }: { match: Match; le
           <>
             <b>{home ?? 0}</b>
             <b>{away ?? 0}</b>
+            {note ? <small>{note}</small> : null}
           </>
         ) : (
           <span>{formatTime(match.utcDate)}</span>
