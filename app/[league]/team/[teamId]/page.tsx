@@ -1,5 +1,6 @@
 import { notFound } from "next/navigation";
 import { ErrorBox } from "@/components/ErrorBox";
+import { Crest } from "@/components/Crest";
 import { FormBadge } from "@/components/Form";
 import { MatchRow } from "@/components/MatchRow";
 import { analyzeTeam, headToHead, perGame, points, type Record } from "@/lib/analysis";
@@ -39,7 +40,7 @@ export default async function TeamPage({ params }: { params: Promise<{ league: s
   return (
     <div className="team-page">
       <div className="team-head">
-        {team.crest ? <img src={team.crest} alt="" width={56} height={56} /> : null}
+        <Crest src={team.crest} tla={team.tla} size={56} />
         <div>
           <h2>{team.name}</h2>
           {row ? (

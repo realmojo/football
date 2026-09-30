@@ -13,3 +13,7 @@ export type LeagueCode = (typeof LEAGUES)[number]["code"];
 export function findLeague(code: string) {
   return LEAGUES.find((l) => l.code === code.toUpperCase());
 }
+
+export function leagueEmblem(code: string) {
+  return `https://crests.football-data.org/${code}.png`;
+}

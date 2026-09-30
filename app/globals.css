@@ -97,6 +97,11 @@ a {
   margin: 24px 0 12px;
 }
 
+.league-head img {
+  align-self: center;
+  object-fit: contain;
+}
+
 .league-head h1 {
   margin: 0;
   font-size: 24px;
@@ -204,11 +209,31 @@ table.standings {
   display: inline-flex;
   align-items: center;
   gap: 8px;
+  min-width: 0;
+  max-width: 100%;
 }
 
-.team img {
+.team span {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.crest {
   object-fit: contain;
   flex-shrink: 0;
+}
+
+.crest-fallback {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  border-radius: 50%;
+  background: var(--border);
+  color: var(--muted);
+  font-weight: 700;
+  letter-spacing: -0.02em;
 }
 
 .team:hover span {
@@ -266,6 +291,33 @@ table.standings {
   border-bottom: none;
 }
 
+/* 좁은 사이드바에서는 시간을 윗줄에 두고 팀 이름 공간을 넓힌다 */
+aside .match {
+  grid-template-columns: minmax(0, 1fr) 48px minmax(0, 1fr);
+  grid-template-areas:
+    "time time time"
+    "home score away";
+  row-gap: 4px;
+}
+
+aside .match-time {
+  grid-area: time;
+  flex-direction: row;
+  gap: 6px;
+}
+
+aside .match-team.home {
+  grid-area: home;
+}
+
+aside .match-score {
+  grid-area: score;
+}
+
+aside .match-team.away {
+  grid-area: away;
+}
+
 .match-time {
   display: flex;
   flex-direction: column;
@@ -283,13 +335,11 @@ table.standings {
 }
 
 .match-team {
+  display: flex;
   min-width: 0;
-  overflow: hidden;
-  text-overflow: ellipsis;
 }
 
 .match-team.home {
-  display: flex;
   justify-content: flex-end;
 }
 
@@ -327,10 +377,6 @@ table.standings {
   align-items: center;
   gap: 16px;
   margin-bottom: 16px;
-}
-
-.team-head img {
-  object-fit: contain;
 }
 
 .team-head h2 {
