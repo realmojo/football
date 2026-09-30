@@ -11,6 +11,11 @@ export const metadata: Metadata = {
   },
   description: "프리미어리그, 라리가, 분데스리가, 세리에 A, 리그 1, 챔피언스리그 순위와 일정, 경기 결과, 팀 분석을 한눈에.",
   applicationName: "토리코리",
+  verification: {
+    other: {
+      "naver-site-verification": "2abf5815d1275fde30cd6248ff5775067484a1c8",
+    },
+  },
   openGraph: {
     siteName: "토리코리",
     type: "website",
