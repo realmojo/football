@@ -30,7 +30,7 @@ export default function PrivacyPage() {
       <h2>2. 이용 목적</h2>
       <ul>
         <li>서비스 제공과 안정적인 운영, 오류 확인과 보안</li>
-        <li>방문 통계 분석을 통한 서비스 개선 (네이버 애널리틱스)</li>
+        <li>방문 통계 분석을 통한 서비스 개선 (Google 애널리틱스, 네이버 애널리틱스)</li>
         <li>광고 게재 (Google AdSense)</li>
         <li>이용자 문의에 대한 답변</li>
       </ul>
@@ -72,7 +72,7 @@ export default function PrivacyPage() {
         </li>
       </ul>
       <p>
-        또한 사이트는 방문 통계를 분석하기 위해 네이버 애널리틱스를 사용합니다. 네이버 애널리틱스는 쿠키를 이용해 방문
+        또한 사이트는 방문 통계를 분석하기 위해 Google 애널리틱스와 네이버 애널리틱스를 사용합니다. 두 서비스는 쿠키를 이용해 방문
         페이지, 방문 시간, 유입 경로 같은 이용 기록을 개인을 식별할 수 없는 형태로 수집합니다.
       </p>
       <p>
@@ -88,7 +88,7 @@ export default function PrivacyPage() {
       <ul>
         <li>Cloudflare, Inc.: 웹사이트 호스팅과 보안</li>
         <li>Supabase, Inc.: 경기 데이터 저장</li>
-        <li>Google LLC: 광고 게재 (Google AdSense)</li>
+        <li>Google LLC: 광고 게재 (Google AdSense), 방문 통계 분석 (Google 애널리틱스)</li>
         <li>네이버 주식회사: 방문 통계 분석 (네이버 애널리틱스)</li>
       </ul>
 
