@@ -37,6 +37,7 @@ gtag('js', new Date());
 gtag('config', 'G-XZ0HSLNP7B');`,
           }}
         />
+        {ADSENSE_CLIENT ? <meta name="google-adsense-account" content={ADSENSE_CLIENT} /> : null}
         {ADSENSE_CLIENT ? (
           <script
             async
