@@ -21,18 +21,30 @@ export const metadata: Metadata = {
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
     <html lang="ko">
+      <head>
+        <link
+          rel="stylesheet"
+          href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable-dynamic-subset.min.css"
+        />
+      </head>
       <body>
-        <header className="header">
-          <div className="container">
-            <a href="/" className="logo">
-              ⚽ 토리코리
+        <header className="masthead">
+          <div className="container masthead-inner">
+            <a href="/" className="brand">
+              토리코리
+              <small>TORICORI</small>
             </a>
             <LeagueNav />
           </div>
         </header>
-        <main className="container">{children}</main>
-        <footer className="container footer">
-          데이터 제공: <a href="https://www.football-data.org">football-data.org</a> · 시간은 한국시간(KST) 기준
+        <main className="container page">{children}</main>
+        <footer className="footer">
+          <div className="container">
+            <strong>토리코리</strong> 해외축구 순위 · 일정 · 결과
+            <span>
+              데이터 <a href="https://www.football-data.org">football-data.org</a> · 한국시간(KST) 기준
+            </span>
+          </div>
         </footer>
       </body>
     </html>

@@ -29,9 +29,11 @@ export default async function LeagueLayout({
   return (
     <>
       <div className="league-head">
-        <Crest src={leagueEmblem(info.code)} tla={info.code} size={32} />
-        <h1>{info.name}</h1>
-        <span className="muted">{info.country}</span>
+        <Crest src={leagueEmblem(info.code)} tla={info.code} size={40} />
+        <div>
+          <p className="eyebrow">{info.country}</p>
+          <h1>{info.name}</h1>
+        </div>
         <SyncedAt code={info.code} />
       </div>
       <SubNav league={info.code} />

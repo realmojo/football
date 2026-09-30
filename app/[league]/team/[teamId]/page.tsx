@@ -61,12 +61,19 @@ export default async function TeamPage({ params }: { params: Promise<{ league: s
   return (
     <div className="team-page">
       <div className="team-head">
-        <Crest src={team.crest} tla={team.tla} size={56} />
+        <Crest src={team.crest} tla={team.tla} size={64} />
         <div>
           <h2>{team.name}</h2>
           {row ? (
-            <p className="muted">
-              {row.position}위 · 승점 {row.points} · {row.won}승 {row.draw}무 {row.lost}패
+            <p className="team-record">
+              <b>{row.position}위</b>
+              <span>승점 {row.points}</span>
+              <span>
+                {row.won}승 {row.draw}무 {row.lost}패
+              </span>
+              <span>
+                득실 {row.goalDifference > 0 ? `+${row.goalDifference}` : row.goalDifference}
+              </span>
             </p>
           ) : null}
         </div>
@@ -76,15 +83,15 @@ export default async function TeamPage({ params }: { params: Promise<{ league: s
         <Stat label="경기당 득점" value={perGame(a.overall.goalsFor, played)} />
         <Stat label="경기당 실점" value={perGame(a.overall.goalsAgainst, played)} />
         <Stat label="경기당 승점" value={perGame(points(a.overall), played)} />
-        <Stat label="무실점 경기" value={`${a.cleanSheets} (${pct(a.cleanSheets)})`} />
-        <Stat label="무득점 경기" value={`${a.failedToScore} (${pct(a.failedToScore)})`} />
-        <Stat label="2.5골 오버" value={`${a.over25} (${pct(a.over25)})`} />
-        <Stat label="양팀 득점" value={`${a.bttsCount} (${pct(a.bttsCount)})`} />
+        <Stat label="무실점" value={String(a.cleanSheets)} sub={pct(a.cleanSheets)} />
+        <Stat label="무득점" value={String(a.failedToScore)} sub={pct(a.failedToScore)} />
+        <Stat label="2.5골 오버" value={String(a.over25)} sub={pct(a.over25)} />
+        <Stat label="양팀 득점" value={String(a.bttsCount)} sub={pct(a.bttsCount)} />
       </div>
 
-      <div className="grid-2">
-        <div className="card">
-          <h3>홈 / 원정 성적</h3>
+      <div className="cols">
+        <div className="block">
+          <h3 className="block-title">홈 / 원정 성적</h3>
           <table className="standings">
             <thead>
               <tr>
@@ -107,8 +114,8 @@ export default async function TeamPage({ params }: { params: Promise<{ league: s
           </table>
         </div>
 
-        <div className="card">
-          <h3>최근 5경기</h3>
+        <div className="block">
+          <h3 className="block-title">최근 5경기</h3>
           <div className="form big">
             {a.lastFive.map(({ match, result }) => (
               <FormBadge key={match.id} result={result} />
@@ -121,8 +128,8 @@ export default async function TeamPage({ params }: { params: Promise<{ league: s
       </div>
 
       {nextMatch && opponent && opponentAnalysis ? (
-        <div className="card">
-          <h3>다음 경기 프리뷰</h3>
+        <div className="block">
+          <h3 className="block-title">다음 경기 프리뷰</h3>
           <MatchRow match={nextMatch} league={code} showDate />
           <table className="standings compare">
             <thead>
@@ -143,7 +150,7 @@ export default async function TeamPage({ params }: { params: Promise<{ league: s
               />
             </tbody>
           </table>
-          <h4>이번 시즌 맞대결</h4>
+          <h4 className="sub-title">이번 시즌 맞대결</h4>
           {h2h.length ? (
             h2h.map((m) => <MatchRow key={m.id} match={m} league={code} showDate />)
           ) : (
@@ -153,8 +160,8 @@ export default async function TeamPage({ params }: { params: Promise<{ league: s
       ) : null}
 
       {a.upcoming.length > 1 ? (
-        <div className="card">
-          <h3>이후 일정</h3>
+        <div className="block">
+          <h3 className="block-title">이후 일정</h3>
           {a.upcoming.slice(1).map((m) => (
             <MatchRow key={m.id} match={m} league={code} showDate />
           ))}
@@ -164,11 +171,14 @@ export default async function TeamPage({ params }: { params: Promise<{ league: s
   );
 }
 
-function Stat({ label, value }: { label: string; value: string }) {
+function Stat({ label, value, sub }: { label: string; value: string; sub?: string }) {
   return (
     <div className="stat">
-      <span className="muted small">{label}</span>
-      <strong>{value}</strong>
+      <span>{label}</span>
+      <strong>
+        {value}
+        {sub ? <small>{sub}</small> : null}
+      </strong>
     </div>
   );
 }

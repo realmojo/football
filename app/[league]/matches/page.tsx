@@ -56,16 +56,19 @@ export default async function MatchesPage({
     <section>
       {matchday != null ? (
         <div className="round-nav">
-          {prev != null ? <a href={`/${code}/matches?matchday=${prev}`}>‹ {prev}R</a> : <span />}
-          <strong>{matchday}라운드</strong>
-          {next != null ? <a href={`/${code}/matches?matchday=${next}`}>{next}R ›</a> : <span />}
+          {prev != null ? <a href={`/${code}/matches?matchday=${prev}`}>← {prev}라운드</a> : <span />}
+          <strong>
+            {matchday}
+            <small>라운드</small>
+          </strong>
+          {next != null ? <a href={`/${code}/matches?matchday=${next}`}>{next}라운드 →</a> : <span />}
         </div>
       ) : null}
 
       {shown.length === 0 ? <p className="muted">경기가 없습니다.</p> : null}
       {groupByDate(shown).map(([date, list]) => (
-        <div key={date} className="card">
-          <h3>{date}</h3>
+        <div key={date} className="block">
+          <h3 className="block-title">{date}</h3>
           {list.map((m) => (
             <MatchRow key={m.id} match={m} league={code} />
           ))}

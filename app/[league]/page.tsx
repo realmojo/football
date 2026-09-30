@@ -4,7 +4,7 @@ import { MatchRow } from "@/components/MatchRow";
 import { TeamLabel } from "@/components/TeamLabel";
 import { computeTable, isFinished, isLive, isUpcoming, recentForm } from "@/lib/analysis";
 import { getSeasonMatches, getStandings } from "@/lib/data";
-import { findLeague } from "@/lib/leagues";
+import { findLeague, ZONE_LABEL, zoneFor, zonesOf } from "@/lib/leagues";
 import type { Match, Standing, StandingsResponse } from "@/lib/types";
 
 const VIEWS = [
@@ -31,11 +31,11 @@ export default async function StandingsPage({
   ]);
 
   return (
-    <div className="grid">
+    <div className="split">
       <section>
-        <div className="section-head">
+        <div className="sec-head">
           <h2>순위</h2>
-          <div className="toggle">
+          <div className="seg">
             {VIEWS.map((v) => (
               <a
                 key={v.key}
@@ -59,7 +59,7 @@ export default async function StandingsPage({
         )}
       </section>
 
-      <aside>
+      <aside className="rail">
         {matchesResult.status === "fulfilled" ? (
           <MatchesSummary matches={matchesResult.value} league={code} />
         ) : (
@@ -104,20 +104,17 @@ function StandingsTables({
   if (tables.length === 0 || tables.every((t) => t.table.length === 0))
     return <p className="muted">순위 정보가 없습니다.</p>;
 
+  const zones = type === "TOTAL" ? zonesOf(league) : [];
+
   return (
     <>
-      {data.season.currentMatchday ? (
-        <p className="muted small">
-          {data.season.startDate.slice(0, 4)}/{data.season.endDate.slice(2, 4)} 시즌 · 현재 {data.season.currentMatchday}라운드
-        </p>
-      ) : null}
       {tables.map((s, i) => (
-        <div key={i} className="card table-wrap">
-          {s.group?.startsWith("GROUP_") ? <h3>{s.group.replace("GROUP_", "")}조</h3> : null}
+        <div key={i} className="table-wrap">
+          {s.group?.startsWith("GROUP_") ? <h3 className="group">{s.group.replace("GROUP_", "")}조</h3> : null}
           <table className="standings">
             <thead>
               <tr>
-                <th>#</th>
+                <th className="pos">순위</th>
                 <th className="left">팀</th>
                 <th>경기</th>
                 <th>승</th>
@@ -126,36 +123,46 @@ function StandingsTables({
                 <th className="hide-sm">득점</th>
                 <th className="hide-sm">실점</th>
                 <th>득실</th>
-                <th>승점</th>
-                <th className="hide-sm">최근 5경기</th>
+                <th className="pts">승점</th>
+                <th className="hide-sm left">최근 5경기</th>
               </tr>
             </thead>
             <tbody>
-              {s.table.map((row) => (
-                <tr key={row.team.id}>
-                  <td>{row.position}</td>
-                  <td className="left">
-                    <TeamLabel team={row.team} league={league} short />
-                  </td>
-                  <td>{row.playedGames}</td>
-                  <td>{row.won}</td>
-                  <td>{row.draw}</td>
-                  <td>{row.lost}</td>
-                  <td className="hide-sm">{row.goalsFor}</td>
-                  <td className="hide-sm">{row.goalsAgainst}</td>
-                  <td>{row.goalDifference > 0 ? `+${row.goalDifference}` : row.goalDifference}</td>
-                  <td>
-                    <strong>{row.points}</strong>
-                  </td>
-                  <td className="hide-sm">
-                    <FormString form={row.form} />
-                  </td>
-                </tr>
-              ))}
+              {s.table.map((row) => {
+                const zone = type === "TOTAL" ? zoneFor(league, row.position) : null;
+                return (
+                  <tr key={row.team.id} className={zone ? `z-${zone}` : undefined}>
+                    <td className="pos">{row.position}</td>
+                    <td className="left">
+                      <TeamLabel team={row.team} league={league} short />
+                    </td>
+                    <td>{row.playedGames}</td>
+                    <td>{row.won}</td>
+                    <td>{row.draw}</td>
+                    <td>{row.lost}</td>
+                    <td className="hide-sm">{row.goalsFor}</td>
+                    <td className="hide-sm">{row.goalsAgainst}</td>
+                    <td>{row.goalDifference > 0 ? `+${row.goalDifference}` : row.goalDifference}</td>
+                    <td className="pts">{row.points}</td>
+                    <td className="hide-sm left">
+                      <FormString form={row.form} />
+                    </td>
+                  </tr>
+                );
+              })}
             </tbody>
           </table>
         </div>
       ))}
+      {zones.length ? (
+        <ul className="legend">
+          {zones.map((z) => (
+            <li key={z} className={`z-${z}`}>
+              {ZONE_LABEL[z]}
+            </li>
+          ))}
+        </ul>
+      ) : null}
     </>
   );
 }
@@ -174,23 +181,23 @@ function MatchesSummary({ matches, league }: { matches: Match[]; league: string 
   return (
     <>
       {live.length > 0 ? (
-        <div className="card">
-          <h3>진행중인 경기</h3>
+        <div className="block">
+          <h3 className="block-title live-title">진행 중</h3>
           {live.map((m) => (
             <MatchRow key={m.id} match={m} league={league} showDate />
           ))}
         </div>
       ) : null}
-      <div className="card">
-        <h3>최근 결과</h3>
+      <div className="block">
+        <h3 className="block-title">최근 결과</h3>
         {recent.length ? (
           recent.map((m) => <MatchRow key={m.id} match={m} league={league} showDate />)
         ) : (
           <p className="muted">경기 결과가 없습니다.</p>
         )}
       </div>
-      <div className="card">
-        <h3>다가오는 경기</h3>
+      <div className="block">
+        <h3 className="block-title">다음 경기</h3>
         {upcoming.length ? (
           upcoming.map((m) => <MatchRow key={m.id} match={m} league={league} showDate />)
         ) : (

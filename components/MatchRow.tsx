@@ -1,5 +1,5 @@
 import { isFinished, isLive } from "@/lib/analysis";
-import { formatKickoff, formatTime, STATUS_LABEL } from "@/lib/format";
+import { formatDay, formatKickoff, formatTime, STATUS_LABEL } from "@/lib/format";
 import type { Match } from "@/lib/types";
 import { TeamLabel } from "./TeamLabel";
 
@@ -8,28 +8,35 @@ export function MatchRow({ match, league, showDate = false }: { match: Match; le
   const live = isLive(match);
   const { home, away } = match.score.fullTime;
   const winner = match.score.winner;
+  const status = match.status === "TIMED" || match.status === "SCHEDULED" ? null : STATUS_LABEL[match.status];
 
   return (
-    <div className={`match ${live ? "live" : ""}`}>
-      <div className="match-time">
-        {showDate ? formatKickoff(match.utcDate) : formatTime(match.utcDate)}
-        <span className="match-status">{STATUS_LABEL[match.status] ?? match.status}</span>
+    <div className={`match${live ? " is-live" : ""}${done ? " is-done" : ""}`}>
+      <div className="match-when">
+        {/* 예정 경기는 시간이 스코어 박스에 들어가므로 날짜만 표시한다 */}
+        {showDate
+          ? done || live
+            ? formatKickoff(match.utcDate)
+            : formatDay(match.utcDate)
+          : done || live
+            ? formatTime(match.utcDate)
+            : null}
+        {status && !done ? <em>{status}</em> : null}
       </div>
-      <div className={`match-team home ${winner === "HOME_TEAM" ? "win" : ""}`}>
+      <div className={`match-side home${winner === "HOME_TEAM" ? " won" : ""}`}>
         <TeamLabel team={match.homeTeam} league={league} short />
       </div>
-      <div className="match-score">
+      <div className="scorebox">
         {done || live ? (
           <>
-            <strong>{home ?? 0}</strong>
-            <span>:</span>
-            <strong>{away ?? 0}</strong>
+            <b>{home ?? 0}</b>
+            <b>{away ?? 0}</b>
           </>
         ) : (
-          <span className="muted">vs</span>
+          <span>{formatTime(match.utcDate)}</span>
         )}
       </div>
-      <div className={`match-team away ${winner === "AWAY_TEAM" ? "win" : ""}`}>
+      <div className={`match-side away${winner === "AWAY_TEAM" ? " won" : ""}`}>
         <TeamLabel team={match.awayTeam} league={league} short />
       </div>
     </div>

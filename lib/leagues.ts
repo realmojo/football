@@ -17,3 +17,33 @@ export function findLeague(code: string) {
 export function leagueEmblem(code: string) {
   return `https://crests.football-data.org/${code}.png`;
 }
+
+// 순위표 구간 표시 (유럽대항전 진출 / 강등권). 전체 순위표에만 표시한다.
+export type Zone = "ucl" | "uel" | "uecl" | "playoff" | "rel" | "ko" | "out";
+
+export const ZONE_LABEL: Record<Zone, string> = {
+  ucl: "챔피언스리그",
+  uel: "유로파리그",
+  uecl: "컨퍼런스리그",
+  playoff: "강등 플레이오프",
+  rel: "강등",
+  ko: "16강 직행",
+  out: "탈락",
+};
+
+const ZONES: Record<string, Array<[from: number, to: number, zone: Zone]>> = {
+  PL: [[1, 4, "ucl"], [5, 5, "uel"], [6, 6, "uecl"], [18, 20, "rel"]],
+  PD: [[1, 4, "ucl"], [5, 5, "uel"], [6, 6, "uecl"], [18, 20, "rel"]],
+  SA: [[1, 4, "ucl"], [5, 5, "uel"], [6, 6, "uecl"], [18, 20, "rel"]],
+  BL1: [[1, 4, "ucl"], [5, 5, "uel"], [6, 6, "uecl"], [16, 16, "playoff"], [17, 18, "rel"]],
+  FL1: [[1, 4, "ucl"], [5, 5, "uel"], [6, 6, "uecl"], [16, 16, "playoff"], [17, 18, "rel"]],
+  CL: [[1, 8, "ko"], [9, 24, "playoff"], [25, 36, "out"]],
+};
+
+export function zoneFor(code: string, position: number): Zone | null {
+  return ZONES[code]?.find(([from, to]) => position >= from && position <= to)?.[2] ?? null;
+}
+
+export function zonesOf(code: string): Zone[] {
+  return [...new Set((ZONES[code] ?? []).map(([, , z]) => z))];
+}

@@ -42,3 +42,12 @@ export const STATUS_LABEL: Record<string, string> = {
   CANCELLED: "취소",
   AWARDED: "몰수",
 };
+
+export function formatDay(utc: string) {
+  return new Intl.DateTimeFormat("ko-KR", {
+    timeZone: TZ,
+    month: "numeric",
+    day: "numeric",
+    weekday: "short",
+  }).format(new Date(utc));
+}
