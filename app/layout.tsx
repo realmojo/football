@@ -66,6 +66,18 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
             <p>© 2026 토리코리 (toricori.com)</p>
           </div>
         </footer>
+        {/* 네이버 애널리틱스 */}
+        <script type="text/javascript" src="https://wcs.pstatic.net/wcslog.js" />
+        <script
+          type="text/javascript"
+          dangerouslySetInnerHTML={{
+            __html: `if(!wcs_add) var wcs_add = {};
+wcs_add["wa"] = "1225732732ef530";
+if(window.wcs) {
+  wcs_do();
+}`,
+          }}
+        />
       </body>
     </html>
   );

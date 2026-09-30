@@ -30,7 +30,7 @@ export default function PrivacyPage() {
       <h2>2. 이용 목적</h2>
       <ul>
         <li>서비스 제공과 안정적인 운영, 오류 확인과 보안</li>
-        <li>방문 통계 분석을 통한 서비스 개선</li>
+        <li>방문 통계 분석을 통한 서비스 개선 (네이버 애널리틱스)</li>
         <li>광고 게재 (Google AdSense)</li>
         <li>이용자 문의에 대한 답변</li>
       </ul>
@@ -72,6 +72,10 @@ export default function PrivacyPage() {
         </li>
       </ul>
       <p>
+        또한 사이트는 방문 통계를 분석하기 위해 네이버 애널리틱스를 사용합니다. 네이버 애널리틱스는 쿠키를 이용해 방문
+        페이지, 방문 시간, 유입 경로 같은 이용 기록을 개인을 식별할 수 없는 형태로 수집합니다.
+      </p>
+      <p>
         이용자는 브라우저 설정에서 쿠키 저장을 거부하거나 삭제할 수 있습니다. 쿠키를 거부해도 사이트의 경기 정보는
         그대로 이용할 수 있으나, 맞춤 광고 대신 일반 광고가 표시될 수 있습니다.
       </p>
@@ -85,6 +89,7 @@ export default function PrivacyPage() {
         <li>Cloudflare, Inc.: 웹사이트 호스팅과 보안</li>
         <li>Supabase, Inc.: 경기 데이터 저장</li>
         <li>Google LLC: 광고 게재 (Google AdSense)</li>
+        <li>네이버 주식회사: 방문 통계 분석 (네이버 애널리틱스)</li>
       </ul>
 
       <h2>6. 이용자의 권리</h2>
