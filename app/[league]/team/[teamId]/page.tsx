@@ -1,3 +1,4 @@
+import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import { ErrorBox } from "@/components/ErrorBox";
 import { Crest } from "@/components/Crest";
@@ -7,6 +8,26 @@ import { analyzeTeam, headToHead, perGame, points, type Record } from "@/lib/ana
 import { getSeasonMatches, getStandings } from "@/lib/data";
 import { findLeague } from "@/lib/leagues";
 import type { Match, TableRow } from "@/lib/types";
+
+export async function generateMetadata({
+  params,
+}: {
+  params: Promise<{ league: string; teamId: string }>;
+}): Promise<Metadata> {
+  const { league, teamId } = await params;
+  const info = findLeague(league);
+  if (!info) return {};
+  const id = Number(teamId);
+  const matches = await getSeasonMatches(info.code).catch(() => []);
+  const m = matches.find((x) => x.homeTeam.id === id || x.awayTeam.id === id);
+  if (!m) return {};
+  const team = m.homeTeam.id === id ? m.homeTeam : m.awayTeam;
+  return {
+    title: `${team.name} 분석 - ${info.name}`,
+    description: `${team.name}의 이번 시즌 성적, 최근 5경기 폼, 홈·원정 기록, 다음 경기 프리뷰.`,
+    alternates: { canonical: `/${info.code}/team/${id}` },
+  };
+}
 
 export default async function TeamPage({ params }: { params: Promise<{ league: string; teamId: string }> }) {
   const { league, teamId } = await params;

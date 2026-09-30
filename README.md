@@ -1,4 +1,4 @@
-# 해외축구 분석
+# 토리코리 (toricori.com)
 
 해외축구 리그 순위, 일정, 경기 결과와 팀별 분석을 보여주는 Next.js 앱입니다.
 데이터는 [football-data.org](https://www.football-data.org) v4 API 에서 Supabase(pflow-kr)로 주기적으로 수집하고,
