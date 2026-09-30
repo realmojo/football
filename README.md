@@ -37,6 +37,20 @@ pg_cron (리그별 10분마다, 1분씩 시차)
 
 무료 플랜은 분당 10회 제한이 있어, 리그마다 1분씩 어긋나게 실행해 분당 2회만 호출합니다.
 
+## Cloudflare 배포 (Workers, OpenNext)
+
+Cloudflare Workers Builds 설정:
+
+| 항목 | 값 |
+|---|---|
+| 빌드 명령 | `npx opennextjs-cloudflare build` |
+| 배포 명령 | `npx opennextjs-cloudflare deploy` |
+| 루트 디렉터리 | `/` |
+
+- Worker 이름은 `wrangler.jsonc` 의 `name`(`football`)입니다. Cloudflare 대시보드의 Worker 이름과 같아야 합니다.
+- Supabase 접속 정보는 공개 값이라 `.env.production` 에 커밋되어 있어 빌드 때 자동으로 들어갑니다. 따로 환경변수를 설정할 필요가 없습니다.
+- 로컬에서 Workers 환경으로 확인: `npm run preview`
+
 ## 실행
 
 ```bash
