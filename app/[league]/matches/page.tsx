@@ -1,4 +1,3 @@
-import Link from "next/link";
 import { ErrorBox } from "@/components/ErrorBox";
 import { MatchRow } from "@/components/MatchRow";
 import { isUpcoming } from "@/lib/analysis";
@@ -57,9 +56,9 @@ export default async function MatchesPage({
     <section>
       {matchday != null ? (
         <div className="round-nav">
-          {prev != null ? <Link href={`/${code}/matches?matchday=${prev}`}>‹ {prev}R</Link> : <span />}
+          {prev != null ? <a href={`/${code}/matches?matchday=${prev}`}>‹ {prev}R</a> : <span />}
           <strong>{matchday}라운드</strong>
-          {next != null ? <Link href={`/${code}/matches?matchday=${next}`}>{next}R ›</Link> : <span />}
+          {next != null ? <a href={`/${code}/matches?matchday=${next}`}>{next}R ›</a> : <span />}
         </div>
       ) : null}
 

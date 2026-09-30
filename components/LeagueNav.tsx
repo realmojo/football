@@ -1,6 +1,5 @@
 "use client";
 
-import Link from "next/link";
 import { useParams } from "next/navigation";
 import { LEAGUES } from "@/lib/leagues";
 
@@ -10,9 +9,9 @@ export function LeagueNav() {
   return (
     <nav className="leaguenav">
       {LEAGUES.map((l) => (
-        <Link key={l.code} href={`/${l.code}`} className={current === l.code ? "active" : ""}>
+        <a key={l.code} href={`/${l.code}`} className={current === l.code ? "active" : ""}>
           {l.name}
-        </Link>
+        </a>
       ))}
     </nav>
   );

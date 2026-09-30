@@ -1,4 +1,3 @@
-import Link from "next/link";
 import { ErrorBox } from "@/components/ErrorBox";
 import { FormString } from "@/components/Form";
 import { MatchRow } from "@/components/MatchRow";
@@ -38,13 +37,13 @@ export default async function StandingsPage({
           <h2>순위</h2>
           <div className="toggle">
             {VIEWS.map((v) => (
-              <Link
+              <a
                 key={v.key}
                 href={v.key === "total" ? `/${code}` : `/${code}?view=${v.key}`}
                 className={v.key === current.key ? "active" : ""}
               >
                 {v.label}
-              </Link>
+              </a>
             ))}
           </div>
         </div>

@@ -1,6 +1,5 @@
 "use client";
 
-import Link from "next/link";
 import { usePathname } from "next/navigation";
 
 export function SubNav({ league }: { league: string }) {
@@ -12,9 +11,9 @@ export function SubNav({ league }: { league: string }) {
   return (
     <nav className="subnav">
       {tabs.map((t) => (
-        <Link key={t.href} href={t.href} className={pathname === t.href ? "active" : ""}>
+        <a key={t.href} href={t.href} className={pathname === t.href ? "active" : ""}>
           {t.label}
-        </Link>
+        </a>
       ))}
     </nav>
   );

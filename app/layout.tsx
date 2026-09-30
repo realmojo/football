@@ -1,5 +1,4 @@
 import type { Metadata } from "next";
-import Link from "next/link";
 import { LeagueNav } from "@/components/LeagueNav";
 import "./globals.css";
 
@@ -14,9 +13,9 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
       <body>
         <header className="header">
           <div className="container">
-            <Link href="/" className="logo">
+            <a href="/" className="logo">
               ⚽ 해외축구 분석
-            </Link>
+            </a>
             <LeagueNav />
           </div>
         </header>
