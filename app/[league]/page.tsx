@@ -3,10 +3,10 @@ import { ErrorBox } from "@/components/ErrorBox";
 import { FormString } from "@/components/Form";
 import { MatchRow } from "@/components/MatchRow";
 import { TeamLabel } from "@/components/TeamLabel";
-import { isFinished, isLive, isUpcoming } from "@/lib/analysis";
+import { computeTable, isFinished, isLive, isUpcoming, recentForm } from "@/lib/analysis";
 import { getSeasonMatches, getStandings } from "@/lib/api";
 import { findLeague } from "@/lib/leagues";
-import type { Match, StandingsResponse } from "@/lib/types";
+import type { Match, Standing, StandingsResponse } from "@/lib/types";
 
 const VIEWS = [
   { key: "total", type: "TOTAL", label: "전체" },
@@ -49,7 +49,12 @@ export default async function StandingsPage({
           </div>
         </div>
         {standingsResult.status === "fulfilled" ? (
-          <StandingsTables data={standingsResult.value} type={current.type} league={code} />
+          <StandingsTables
+            data={standingsResult.value}
+            matches={matchesResult.status === "fulfilled" ? matchesResult.value : null}
+            type={current.type}
+            league={code}
+          />
         ) : (
           <ErrorBox error={standingsResult.reason} />
         )}
@@ -66,21 +71,50 @@ export default async function StandingsPage({
   );
 }
 
-function StandingsTables({ data, type, league }: { data: StandingsResponse; type: string; league: string }) {
-  const tables = data.standings.filter((s) => s.type === type);
-  if (tables.length === 0) return <p className="muted">순위 정보가 없습니다.</p>;
+// API 가 주지 않는 홈/원정 순위와 최근 폼을 경기 결과로 보완한다.
+function resolveTables(data: StandingsResponse, matches: Match[] | null, type: Standing["type"]): Standing[] {
+  const fromApi = data.standings.filter((s) => s.type === type);
+  if (!matches) return fromApi;
+  if (fromApi.length > 0) {
+    return fromApi.map((s) => ({
+      ...s,
+      table: s.table.map((row) => ({ ...row, form: row.form ?? (recentForm(matches, row.team.id) || null) })),
+    }));
+  }
+  return data.standings
+    .filter((s) => s.type === "TOTAL")
+    .map((s) => {
+      const ids = new Set(s.table.map((r) => r.team.id));
+      const groupMatches = matches.filter((m) => ids.has(m.homeTeam.id) && ids.has(m.awayTeam.id));
+      return { ...s, type, table: computeTable(groupMatches, s.table.map((r) => r.team), type) };
+    });
+}
+
+function StandingsTables({
+  data,
+  matches,
+  type,
+  league,
+}: {
+  data: StandingsResponse;
+  matches: Match[] | null;
+  type: Standing["type"];
+  league: string;
+}) {
+  const tables = resolveTables(data, matches, type);
+  if (tables.length === 0 || tables.every((t) => t.table.length === 0))
+    return <p className="muted">순위 정보가 없습니다.</p>;
 
   return (
     <>
       {data.season.currentMatchday ? (
         <p className="muted small">
-          {data.season.startDate.slice(0, 4)}/{data.season.endDate.slice(2, 4)} 시즌 · {data.season.currentMatchday}
-          라운드
+          {data.season.startDate.slice(0, 4)}/{data.season.endDate.slice(2, 4)} 시즌 · 현재 {data.season.currentMatchday}라운드
         </p>
       ) : null}
       {tables.map((s, i) => (
         <div key={i} className="card table-wrap">
-          {s.group ? <h3>{s.group.replace("GROUP_", "")}조</h3> : null}
+          {s.group?.startsWith("GROUP_") ? <h3>{s.group.replace("GROUP_", "")}조</h3> : null}
           <table className="standings">
             <thead>
               <tr>

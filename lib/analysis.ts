@@ -1,4 +1,4 @@
-import type { Match } from "./types";
+import type { Match, TableRow, Team } from "./types";
 
 export type Result = "W" | "D" | "L";
 
@@ -119,4 +119,49 @@ export function headToHead(allMatches: Match[], teamA: number, teamB: number) {
           (m.homeTeam.id === teamB && m.awayTeam.id === teamA)),
     )
     .sort((a, b) => b.utcDate.localeCompare(a.utcDate));
+}
+
+// 최근 5경기 결과 ("W,D,L,..." 최신순). football-data.org 무료 플랜은 form 을 주지 않아 직접 계산한다.
+export function recentForm(allMatches: Match[], teamId: number, count = 5) {
+  return teamMatches(allMatches, teamId)
+    .filter(isFinished)
+    .sort((a, b) => b.utcDate.localeCompare(a.utcDate))
+    .slice(0, count)
+    .map((m) => resultFor(m, teamId))
+    .join(",");
+}
+
+// 경기 결과로 전체/홈/원정 순위표를 계산한다. (무료 플랜은 HOME/AWAY 순위를 주지 않음)
+export function computeTable(allMatches: Match[], teams: Team[], side: "TOTAL" | "HOME" | "AWAY"): TableRow[] {
+  const rows = teams.map((team) => {
+    const played = teamMatches(allMatches, team.id).filter(
+      (m) =>
+        side === "TOTAL" ||
+        (side === "HOME" && m.homeTeam.id === team.id) ||
+        (side === "AWAY" && m.awayTeam.id === team.id),
+    );
+    const r = buildRecord(played, team.id);
+    return {
+      position: 0,
+      team,
+      playedGames: r.played,
+      form: recentForm(played, team.id) || null,
+      won: r.won,
+      draw: r.draw,
+      lost: r.lost,
+      points: points(r),
+      goalsFor: r.goalsFor,
+      goalsAgainst: r.goalsAgainst,
+      goalDifference: r.goalsFor - r.goalsAgainst,
+    };
+  });
+  rows.sort(
+    (a, b) =>
+      b.points - a.points ||
+      b.goalDifference - a.goalDifference ||
+      b.goalsFor - a.goalsFor ||
+      a.team.name.localeCompare(b.team.name),
+  );
+  rows.forEach((row, i) => (row.position = i + 1));
+  return rows;
 }
