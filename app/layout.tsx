@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import Image from "next/image";
 import { LeagueNav } from "@/components/LeagueNav";
 import { ADSENSE_CLIENT } from "@/lib/site";
 import "./globals.css";
@@ -55,8 +56,8 @@ gtag('config', 'G-XZ0HSLNP7B');`,
         <header className="masthead">
           <div className="container masthead-inner">
             <a href="/" className="brand" aria-label="토리코리 홈">
-              토리코리
-              <small>TORICORI</small>
+              <Image src="/brand/toricori-logo.png" alt="" width={36} height={36} className="brand-mark" unoptimized loading="eager" />
+              <span className="brand-wordmark">토리코리<small>TORICORI</small></span>
             </a>
             <LeagueNav />
           </div>
@@ -65,7 +66,10 @@ gtag('config', 'G-XZ0HSLNP7B');`,
         <footer className="footer">
           <div className="container">
             <div className="footer-top">
-              <strong>토리코리</strong>
+              <a href="/" className="footer-brand" aria-label="토리코리 홈">
+                <Image src="/brand/toricori-logo.png" alt="" width={24} height={24} unoptimized />
+                <strong>토리코리</strong>
+              </a>
               <nav className="footer-nav">
                 <a href="/about">사이트 소개</a>
                 <a href="/articles">축구 칼럼</a>

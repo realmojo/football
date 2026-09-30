@@ -98,8 +98,9 @@ p {
 
 .brand {
   display: flex;
-  align-items: baseline;
-  gap: 8px;
+  align-items: center;
+  gap: 9px;
+  flex-shrink: 0;
   align-self: center;
   font-size: 21px;
   font-weight: 900;
@@ -107,8 +108,20 @@ p {
   white-space: nowrap;
 }
 
+.brand-mark {
+  display: block;
+  flex-shrink: 0;
+}
+
+.brand-wordmark {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+  line-height: 1;
+}
+
 .brand small {
-  font-size: 10px;
+  font-size: 9px;
   font-weight: 700;
   letter-spacing: 0.18em;
   color: var(--signal);
@@ -1426,6 +1439,17 @@ table.standings {
   align-items: baseline;
   gap: 8px 24px;
   margin-bottom: 10px;
+}
+
+.footer-brand {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  white-space: nowrap;
+}
+
+.footer-brand img {
+  display: block;
 }
 
 .footer-nav {

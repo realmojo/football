@@ -1,0 +1,17 @@
+Mode: built-in image_gen; transparent background enabled.
+
+Use case: logo-brand
+Asset type: production-ready square brand symbol for TORICORI (토리코리), a Korean European football standings and analysis website. This same symbol will be displayed at 36px in a compact website masthead and used as the source for a favicon.
+Primary request: Create a distinctive, beautifully simple football emblem. A golden yellow football with a bold dark navy central pentagon and a few broad geometric navy panel seams, with a subtle forward-motion gesture in the silhouette. A confident editorial sports identity, compact and memorable.
+Style/medium: extremely clean flat vector-like logo artwork, solid filled geometric shapes, precise edges, minimal.
+Color palette: golden yellow #ffc629 and deep navy #0e1a2b only.
+Composition: one single centered roughly circular symbol, occupies 85% of a square canvas, thick substantial shapes which remain clear at 16px. Fully transparent background including outside the emblem.
+Text: none.
+Constraints: only one logo symbol, no wordmark, no letters, no presentation sheet, no mockup, no gradients, no lighting, no shadows, no texture, no tiny details, no thin strokes, no white backdrop, no existing football club insignia. Deliver an actual transparent PNG.
+
+Source: toricori-source.png
+Website logo: ../../public/brand/toricori-logo.png (256 x 256, transparent PNG)
+Browser icon: ../../app/icon.png (192 x 192, transparent PNG)
+Favicon: ../../app/favicon.ico (16, 32, 48 px)
+Apple touch icon: ../../app/apple-icon.png (180 x 180, navy background)
+Previous icons preserved in previous-icons/.
