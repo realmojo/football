@@ -3,7 +3,7 @@ import { Crest } from "@/components/Crest";
 import { MatchRow } from "@/components/MatchRow";
 import { TeamLabel } from "@/components/TeamLabel";
 import { isFinished, isUpcoming } from "@/lib/analysis";
-import { getSeasonMatches, getStandings } from "@/lib/data";
+import { getArticles, getSeasonMatches, getStandings } from "@/lib/data";
 import { finalMatch, winnerOf } from "@/lib/cup";
 import { isCup, LEAGUES, leagueEmblem } from "@/lib/leagues";
 import type { Match, StandingsResponse } from "@/lib/types";
@@ -26,6 +26,8 @@ export default async function HomePage() {
       };
     }),
   );
+
+  const articles = await getArticles(4).catch(() => []);
 
   const leagueResults = results.filter((r) => !isCup(r.league));
   const worldCup = results.find((r) => r.league.code === "WC");
@@ -85,6 +87,25 @@ export default async function HomePage() {
         </aside>
       </div>
 
+      {articles.length ? (
+        <section className="home-articles">
+          <div className="sec-head">
+            <h2>축구 칼럼</h2>
+            <a href="/articles">전체 보기 →</a>
+          </div>
+          <ul>
+            {articles.map((a) => (
+              <li key={a.slug}>
+                <a href={`/articles/${a.slug}`}>
+                  <strong>{a.title}</strong>
+                  <span>{a.description}</span>
+                </a>
+              </li>
+            ))}
+          </ul>
+        </section>
+      ) : null}
+
       <section className="home-about">
         <h2>토리코리 활용법</h2>
         <div className="home-about-cols">
@@ -102,8 +123,8 @@ export default async function HomePage() {
           <div>
             <h3>팀 분석</h3>
             <p>
-              경기당 득점·실점, 무실점 비율, 최근 5경기 흐름 등을 계산해 보여줍니다. 지표 설명은{" "}
-              <a href="/guide">이용 가이드</a>에 있습니다.
+              경기당 득점·실점, 무실점 비율, 최근 5경기 흐름 등을 계산해 보여줍니다. 리그끼리의 차이는{" "}
+              <a href="/stats">5대 리그 통계 비교</a>에서, 낯선 용어는 <a href="/glossary">축구 용어 사전</a>에서 확인하세요.
             </p>
           </div>
         </div>

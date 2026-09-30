@@ -1,6 +1,7 @@
 import "server-only";
 import { cache } from "react";
 import { createClient } from "@supabase/supabase-js";
+import type { Article, ArticleSummary } from "./articles";
 import { nationName } from "./labels";
 import type { Match, MatchStatus, Player, Scorer, Standing, StandingsResponse, Team, TeamProfile } from "./types";
 
@@ -201,4 +202,85 @@ export const getTeamProfile = cache(async (teamId: number): Promise<TeamProfile 
       }),
     ),
   };
+});
+
+const ARTICLE_SUMMARY_COLUMNS = "slug, title, description, category, published_at, updated_at";
+
+function toArticleSummary(r: {
+  slug: string;
+  title: string;
+  description: string;
+  category: string;
+  published_at: string;
+  updated_at: string;
+}): ArticleSummary {
+  return {
+    slug: r.slug,
+    title: r.title,
+    description: r.description,
+    category: r.category as ArticleSummary["category"],
+    publishedAt: r.published_at,
+    updatedAt: r.updated_at,
+  };
+}
+
+// 공개된 칼럼 목록 (최신순). RLS 가 공개된 글만 돌려준다.
+export const getArticles = cache(async (limit?: number): Promise<ArticleSummary[]> => {
+  let query = supabase
+    .from("football_articles")
+    .select(ARTICLE_SUMMARY_COLUMNS)
+    .order("published_at", { ascending: false })
+    .order("created_at", { ascending: false });
+  if (limit) query = query.limit(limit);
+  const { data, error } = await query;
+  if (error) throw new DataError("db", error.message);
+  return (data ?? []).map(toArticleSummary);
+});
+
+export const getArticle = cache(async (slug: string): Promise<Article | null> => {
+  const { data, error } = await supabase
+    .from("football_articles")
+    .select(`${ARTICLE_SUMMARY_COLUMNS}, body`)
+    .eq("slug", slug)
+    .maybeSingle();
+  if (error) throw new DataError("db", error.message);
+  return data ? { ...toArticleSummary(data), body: data.body } : null;
+});
+
+export interface GlossaryTerm {
+  slug: string;
+  term: string;
+  english: string | null;
+  category: string;
+  // 신뢰할 수 있는 HTML (링크 포함)
+  body: string;
+}
+
+export const GLOSSARY_CATEGORIES = ["경기 규칙", "기록 · 통계", "대회 · 제도", "전술 · 포지션", "이적 · 구단"] as const;
+
+export const getGlossary = cache(async (): Promise<GlossaryTerm[]> => {
+  const { data, error } = await supabase
+    .from("football_glossary")
+    .select("slug, term, english, category, body")
+    .order("sort")
+    .order("term");
+  if (error) throw new DataError("db", error.message);
+  return data ?? [];
+});
+
+export interface TeamIntro {
+  nickname: string | null;
+  tags: string[];
+  // 신뢰할 수 있는 HTML 문단
+  intro: string;
+}
+
+export const getTeamIntro = cache(async (teamId: number): Promise<TeamIntro | null> => {
+  const { data, error } = await supabase
+    .from("football_team_profiles")
+    .select("nickname, tags, intro")
+    .eq("team_id", teamId)
+    .maybeSingle();
+  if (error) throw new DataError("db", error.message);
+  return data;
 });

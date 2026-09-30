@@ -140,3 +140,6 @@ export function stageLabel(stage: string) {
 export function groupLabel(group: string | null | undefined) {
   return group?.startsWith("GROUP_") ? `${group.slice(6)}조` : "";
 }
+
+// 5대 리그 (컵대회·챔피언스리그 제외). 리그 간 비교 통계에 쓴다.
+export const DOMESTIC_LEAGUES = LEAGUES.filter((l) => ["PL", "PD", "BL1", "SA", "FL1"].includes(l.code));

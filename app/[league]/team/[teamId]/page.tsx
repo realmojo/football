@@ -4,8 +4,9 @@ import { ErrorBox } from "@/components/ErrorBox";
 import { Crest } from "@/components/Crest";
 import { FormBadge } from "@/components/Form";
 import { MatchRow } from "@/components/MatchRow";
+import { Stat } from "@/components/Stat";
 import { analyzeTeam, headToHead, perGame, points, type Record } from "@/lib/analysis";
-import { getScorers, getSeasonMatches, getStandings, getTeamProfile } from "@/lib/data";
+import { getScorers, getSeasonMatches, getStandings, getTeamIntro, getTeamProfile, type TeamIntro } from "@/lib/data";
 import { age, countryLabel, POSITION_GROUP_LABEL, positionGroup, positionLabel, type PositionGroup } from "@/lib/labels";
 import { findLeague, groupLabel, isCup, stageLabel } from "@/lib/leagues";
 import { teamFinish } from "@/lib/cup";
@@ -24,9 +25,10 @@ export async function generateMetadata({
   const m = matches.find((x) => x.homeTeam.id === id || x.awayTeam.id === id);
   if (!m) return {};
   const team = m.homeTeam.id === id ? m.homeTeam : m.awayTeam;
+  const intro = await getTeamIntro(id).catch(() => null);
   return {
     title: `${team.name} 분석 - ${info.name}`,
-    description: `${team.name}의 이번 시즌 성적, 최근 5경기 폼, 홈·원정 기록, 다음 경기 프리뷰.`,
+    description: `${team.name}${intro?.nickname ? `(${intro.nickname})` : ""}의 구단 소개와 이번 시즌 성적, 최근 5경기 폼, 홈·원정 기록, 다음 경기 프리뷰.`,
     alternates: { canonical: `/${info.code}/team/${id}` },
   };
 }
@@ -42,15 +44,18 @@ export default async function TeamPage({ params }: { params: Promise<{ league: s
   let rows: TableRow[] = [];
   let profile: TeamProfile | null = null;
   let teamScorers: Scorer[] = [];
+  let intro: TeamIntro | null = null;
   try {
-    const [m, s, p, sc] = await Promise.all([
+    const [m, s, p, sc, ti] = await Promise.all([
       getSeasonMatches(code),
       getStandings(code).catch(() => null),
       getTeamProfile(id).catch(() => null),
       getScorers(code).catch(() => []),
+      getTeamIntro(id).catch(() => null),
     ]);
     matches = m;
     profile = p;
+    intro = ti;
     teamScorers = sc.filter((x) => x.team?.id === id);
     rows = s?.standings.find((st) => st.type === "TOTAL" && st.table.some((r) => r.team.id === id))?.table ?? [];
   } catch (e) {
@@ -112,6 +117,22 @@ export default async function TeamPage({ params }: { params: Promise<{ league: s
         <Stat label="2.5골 오버" value={String(a.over25)} sub={pct(a.over25)} />
         <Stat label="양팀 득점" value={String(a.bttsCount)} sub={pct(a.bttsCount)} />
       </div>
+
+      {intro ? (
+        <section className="team-intro">
+          <h3 className="block-title">
+            구단 소개{intro.nickname ? ` · ${intro.nickname}` : ""}
+          </h3>
+          {intro.tags.length ? (
+            <div className="team-tags">
+              {intro.tags.map((t) => (
+                <span key={t}>{t}</span>
+              ))}
+            </div>
+          ) : null}
+          <div dangerouslySetInnerHTML={{ __html: intro.intro }} />
+        </section>
+      ) : null}
 
       {cup ? (
         <div className="block">
@@ -318,18 +339,6 @@ function Squad({ squad }: { squad: Player[] }) {
             </div>
           ))}
       </div>
-    </div>
-  );
-}
-
-function Stat({ label, value, sub }: { label: string; value: string; sub?: string }) {
-  return (
-    <div className="stat">
-      <span>{label}</span>
-      <strong>
-        {value}
-        {sub ? <small>{sub}</small> : null}
-      </strong>
     </div>
   );
 }

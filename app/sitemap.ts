@@ -1,5 +1,6 @@
 import type { MetadataRoute } from "next";
-import { getSeasonMatches, getStandings } from "@/lib/data";
+import { getArticles, getSeasonMatches, getStandings } from "@/lib/data";
+import { completedRounds } from "@/lib/insights";
 import { isCup, LEAGUES } from "@/lib/leagues";
 import { SITE_URL } from "@/lib/site";
 
@@ -8,6 +9,7 @@ export const dynamic = "force-dynamic";
 
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   const now = new Date();
+  const articles = await getArticles().catch(() => []);
   const pages: MetadataRoute.Sitemap = [
     { url: `${SITE_URL}/`, lastModified: now, changeFrequency: "hourly", priority: 1 },
     ...["about", "guide", "privacy", "terms", "contact"].map((p) => ({
@@ -15,6 +17,15 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
       lastModified: now,
       changeFrequency: "monthly" as const,
       priority: 0.3,
+    })),
+    { url: `${SITE_URL}/stats`, lastModified: now, changeFrequency: "daily", priority: 0.7 },
+    { url: `${SITE_URL}/glossary`, lastModified: now, changeFrequency: "monthly", priority: 0.5 },
+    { url: `${SITE_URL}/articles`, lastModified: now, changeFrequency: "weekly", priority: 0.7 },
+    ...articles.map((a) => ({
+      url: `${SITE_URL}/articles/${a.slug}`,
+      lastModified: new Date(a.updatedAt),
+      changeFrequency: "monthly" as const,
+      priority: 0.7,
     })),
   ];
 
@@ -30,8 +41,15 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
       const matches = await getSeasonMatches(l.code).catch(() => []);
       teamIds = new Set(matches.flatMap((m) => [m.homeTeam.id, m.awayTeam.id]));
     } else {
-      const standings = await getStandings(l.code).catch(() => null);
+      const [standings, matches] = await Promise.all([
+        getStandings(l.code).catch(() => null),
+        getSeasonMatches(l.code).catch(() => []),
+      ]);
       teamIds = new Set(standings?.standings.flatMap((s) => s.table.map((r) => r.team.id)) ?? []);
+      pages.push({ url: `${SITE_URL}/${l.code}/stats`, lastModified: now, changeFrequency: "daily", priority: 0.7 });
+      for (const day of completedRounds(matches)) {
+        pages.push({ url: `${SITE_URL}/${l.code}/round/${day}`, changeFrequency: "weekly", priority: 0.6 });
+      }
     }
     for (const id of teamIds) {
       pages.push({ url: `${SITE_URL}/${l.code}/team/${id}`, lastModified: now, changeFrequency: "daily", priority: 0.6 });

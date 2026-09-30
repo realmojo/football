@@ -59,6 +59,14 @@ Cloudflare Workers Builds 설정:
 
 - 소개(`/about`), 이용 가이드(`/guide`), 개인정보처리방침(`/privacy`), 이용약관(`/terms`), 문의(`/contact`) 페이지와
   `sitemap.xml`, `robots.txt` 가 있습니다.
+- 직접 쓴 콘텐츠는 Supabase 테이블에 있고, 배포 없이 행을 추가·수정하면 바로 반영됩니다. 쓰기는 service_role 만 가능합니다.
+  | 테이블 | 화면 | 초기 데이터 |
+  |---|---|---|
+  | `football_articles` | 축구 칼럼 `/articles` (본문 HTML, `published = true` 인 글만 공개) | `supabase/seed/football_articles.sql` |
+  | `football_glossary` | 축구 용어 사전 `/glossary` | `supabase/seed/football_glossary.sql` |
+  | `football_team_profiles` | 팀 분석 화면의 구단 소개 | `supabase/seed/football_team_profiles_*.sql` |
+- 경기 데이터로 자동 생성하는 분석 페이지: 5대 리그 통계 비교(`/stats`), 리그별 시즌 통계(`/{리그}/stats`),
+  라운드 리뷰(`/{리그}/round/{n}`, 모든 경기가 끝난 라운드만). 계산은 `lib/insights.ts`, 문장은 `lib/narrative.ts` 에 있습니다.
 - 승인 후 게시자 ID 를 `.env.production` 에 넣으면 광고 스크립트와 `/ads.txt` 가 켜집니다.
   ```
   NEXT_PUBLIC_ADSENSE_CLIENT=ca-pub-XXXXXXXXXXXXXXXX

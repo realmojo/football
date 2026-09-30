@@ -1,6 +1,7 @@
 import { ErrorBox } from "@/components/ErrorBox";
 import { MatchRow } from "@/components/MatchRow";
 import { isUpcoming } from "@/lib/analysis";
+import { completedRounds } from "@/lib/insights";
 import { getSeasonMatches } from "@/lib/data";
 import { formatDateHeading } from "@/lib/format";
 import { CUP_STAGES, findLeague, groupLabel, isCup } from "@/lib/leagues";
@@ -66,6 +67,13 @@ export default async function MatchesPage({
           </strong>
           {next != null ? <a href={`/${code}/matches?matchday=${next}`}>{next}라운드 →</a> : <span />}
         </div>
+      ) : null}
+
+      {matchday != null && completedRounds(matches).includes(matchday) ? (
+        <a href={`/${code}/round/${matchday}`} className="review-link">
+          <strong>{matchday}라운드 리뷰</strong>
+          <span>순위 변동, 이변과 역전승, 이어지는 연승·연패 기록을 정리했습니다 →</span>
+        </a>
       ) : null}
 
       {shown.length === 0 ? <p className="muted">경기가 없습니다.</p> : null}

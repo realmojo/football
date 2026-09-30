@@ -68,6 +68,9 @@ gtag('config', 'G-XZ0HSLNP7B');`,
               <strong>토리코리</strong>
               <nav className="footer-nav">
                 <a href="/about">사이트 소개</a>
+                <a href="/articles">축구 칼럼</a>
+                <a href="/stats">5대 리그 통계</a>
+                <a href="/glossary">축구 용어 사전</a>
                 <a href="/guide">이용 가이드</a>
                 <a href="/privacy">개인정보처리방침</a>
                 <a href="/terms">이용약관</a>
