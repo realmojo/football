@@ -838,3 +838,291 @@ table.standings {
     margin-left: 0;
   }
 }
+
+/* ── 글 페이지 (소개·정책) ─────────────────────────── */
+
+.prose {
+  max-width: 760px;
+  font-size: 15px;
+  line-height: 1.75;
+  color: var(--ink);
+}
+
+.prose header {
+  border-bottom: 3px solid var(--rule);
+  padding-bottom: 18px;
+  margin-bottom: 8px;
+}
+
+.prose h1 {
+  font-size: 30px;
+  font-weight: 900;
+  letter-spacing: -0.045em;
+  line-height: 1.2;
+}
+
+.prose .lead {
+  margin-top: 10px;
+  font-size: 16px;
+  color: var(--ink-2);
+}
+
+.prose h2 {
+  font-size: 18px;
+  font-weight: 800;
+  letter-spacing: -0.03em;
+  margin: 32px 0 10px;
+  padding-top: 14px;
+  border-top: 1px solid var(--line);
+}
+
+.prose p {
+  margin: 0 0 12px;
+}
+
+.prose ul {
+  margin: 0 0 12px;
+  padding-left: 20px;
+}
+
+.prose li {
+  margin-bottom: 6px;
+}
+
+.prose a {
+  color: var(--z-ucl);
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+
+.prose dl {
+  margin: 0;
+}
+
+.prose dt {
+  font-weight: 800;
+  margin-top: 14px;
+}
+
+.prose dd {
+  margin: 4px 0 0;
+  color: var(--ink-2);
+}
+
+.contact-box {
+  display: flex;
+  align-items: baseline;
+  gap: 16px;
+  margin: 24px 0 8px;
+  padding: 18px 20px;
+  background: var(--surface);
+  border-left: 4px solid var(--signal);
+}
+
+.contact-box span {
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--ink-3);
+}
+
+.prose .contact-box a {
+  font-size: 20px;
+  font-weight: 800;
+  color: var(--ink);
+  text-decoration: none;
+}
+
+/* ── 홈 ─────────────────────────── */
+
+.home-hero {
+  border-bottom: 3px solid var(--rule);
+  padding-bottom: 20px;
+  margin-bottom: 28px;
+}
+
+.home-hero h1 {
+  font-size: 32px;
+  font-weight: 900;
+  letter-spacing: -0.05em;
+  line-height: 1.2;
+}
+
+.home-hero p {
+  margin-top: 10px;
+  max-width: 720px;
+  font-size: 15px;
+  line-height: 1.7;
+  color: var(--ink-2);
+}
+
+.league-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 28px 24px;
+}
+
+.mini {
+  background: var(--surface);
+  border-top: 2px solid var(--rule);
+}
+
+.mini-head {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 10px 8px;
+  border-bottom: 1px solid var(--line);
+}
+
+.mini-head strong {
+  font-size: 15px;
+  font-weight: 800;
+}
+
+.mini-more {
+  margin-left: auto;
+  font-size: 12px;
+  font-weight: 700;
+  color: var(--ink-3);
+}
+
+.mini-head:hover .mini-more {
+  color: var(--ink);
+}
+
+.mini-table th,
+.mini-table td {
+  height: 36px;
+}
+
+.mini-empty {
+  padding: 16px 10px;
+}
+
+.tagged {
+  border-bottom: 1px solid var(--line-2);
+  padding-top: 8px;
+}
+
+.tagged .match {
+  border-bottom: none;
+  padding-top: 4px;
+}
+
+.tag {
+  font-size: 11px;
+  font-weight: 800;
+  color: var(--ink-2);
+  border: 1px solid var(--line);
+  padding: 1px 6px;
+}
+
+.home-about {
+  margin-top: 16px;
+  border-top: 3px solid var(--rule);
+  padding-top: 16px;
+}
+
+.home-about h2 {
+  font-size: 18px;
+  font-weight: 800;
+  letter-spacing: -0.03em;
+  margin-bottom: 14px;
+}
+
+.home-about-cols {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 24px;
+}
+
+.home-about h3 {
+  font-size: 14px;
+  font-weight: 800;
+  margin-bottom: 6px;
+}
+
+.home-about p {
+  font-size: 14px;
+  line-height: 1.7;
+  color: var(--ink-2);
+}
+
+.home-about a,
+.league-intro a {
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+
+/* ── 리그 소개 ─────────────────────────── */
+
+.league-intro {
+  margin-top: 36px;
+  border-top: 2px solid var(--rule);
+  padding-top: 14px;
+  max-width: 760px;
+}
+
+.league-intro h2 {
+  font-size: 16px;
+  font-weight: 800;
+  margin-bottom: 10px;
+}
+
+.league-intro p {
+  font-size: 14px;
+  line-height: 1.75;
+  color: var(--ink-2);
+  margin-bottom: 10px;
+}
+
+/* ── 푸터 ─────────────────────────── */
+
+.footer .container {
+  display: block;
+}
+
+.footer-top {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: 8px 24px;
+  margin-bottom: 10px;
+}
+
+.footer-nav {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px 18px;
+}
+
+.footer-nav a {
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--ink-2);
+  text-decoration: none;
+}
+
+.footer-nav a:hover {
+  color: var(--ink);
+  text-decoration: underline;
+}
+
+.footer p {
+  margin: 4px 0 0;
+  line-height: 1.6;
+}
+
+@media (max-width: 900px) {
+  .league-grid,
+  .home-about-cols {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}
+
+@media (max-width: 640px) {
+  .home-hero h1,
+  .prose h1 {
+    font-size: 24px;
+  }
+}

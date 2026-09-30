@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { LeagueNav } from "@/components/LeagueNav";
+import { ADSENSE_CLIENT } from "@/lib/site";
 import "./globals.css";
 
 export const metadata: Metadata = {
@@ -26,11 +27,18 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
           rel="stylesheet"
           href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable-dynamic-subset.min.css"
         />
+        {ADSENSE_CLIENT ? (
+          <script
+            async
+            src={`https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=${ADSENSE_CLIENT}`}
+            crossOrigin="anonymous"
+          />
+        ) : null}
       </head>
       <body>
         <header className="masthead">
           <div className="container masthead-inner">
-            <a href="/" className="brand">
+            <a href="/" className="brand" aria-label="토리코리 홈">
               토리코리
               <small>TORICORI</small>
             </a>
@@ -40,10 +48,22 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         <main className="container page">{children}</main>
         <footer className="footer">
           <div className="container">
-            <strong>토리코리</strong> 해외축구 순위 · 일정 · 결과
-            <span>
-              데이터 <a href="https://www.football-data.org">football-data.org</a> · 한국시간(KST) 기준
-            </span>
+            <div className="footer-top">
+              <strong>토리코리</strong>
+              <nav className="footer-nav">
+                <a href="/about">사이트 소개</a>
+                <a href="/guide">이용 가이드</a>
+                <a href="/privacy">개인정보처리방침</a>
+                <a href="/terms">이용약관</a>
+                <a href="/contact">문의하기</a>
+              </nav>
+            </div>
+            <p>
+              해외축구 순위 · 일정 · 결과와 팀 분석. 경기 데이터는{" "}
+              <a href="https://www.football-data.org">football-data.org</a> 에서 제공받으며, 모든 시간은
+              한국시간(KST) 기준입니다.
+            </p>
+            <p>© 2026 토리코리 (toricori.com)</p>
           </div>
         </footer>
       </body>

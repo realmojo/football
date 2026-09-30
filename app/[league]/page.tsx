@@ -22,7 +22,8 @@ export default async function StandingsPage({
 }) {
   const { league } = await params;
   const { view = "total" } = await searchParams;
-  const code = findLeague(league)!.code;
+  const info = findLeague(league)!;
+  const code = info.code;
   const current = VIEWS.find((v) => v.key === view) ?? VIEWS[0];
 
   const [standingsResult, matchesResult] = await Promise.allSettled([
@@ -57,6 +58,16 @@ export default async function StandingsPage({
         ) : (
           <ErrorBox error={standingsResult.reason} />
         )}
+
+        <div className="league-intro">
+          <h2>{info.name} 알아보기</h2>
+          {info.intro.map((p, i) => (
+            <p key={i}>{p}</p>
+          ))}
+          <p className="muted">
+            순위표 항목과 색 막대의 뜻은 <a href="/guide">이용 가이드</a>에서 자세히 볼 수 있습니다.
+          </p>
+        </div>
       </section>
 
       <aside className="rail">

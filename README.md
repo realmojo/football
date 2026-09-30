@@ -51,6 +51,16 @@ Cloudflare Workers Builds 설정:
 - Supabase 접속 정보는 공개 값이라 `.env.production` 에 커밋되어 있어 빌드 때 자동으로 들어갑니다. 따로 환경변수를 설정할 필요가 없습니다.
 - 로컬에서 Workers 환경으로 확인: `npm run preview`
 
+## 애드센스
+
+- 소개(`/about`), 이용 가이드(`/guide`), 개인정보처리방침(`/privacy`), 이용약관(`/terms`), 문의(`/contact`) 페이지와
+  `sitemap.xml`, `robots.txt` 가 있습니다.
+- 승인 후 게시자 ID 를 `.env.production` 에 넣으면 광고 스크립트와 `/ads.txt` 가 켜집니다.
+  ```
+  NEXT_PUBLIC_ADSENSE_CLIENT=ca-pub-XXXXXXXXXXXXXXXX
+  ```
+- 문의 이메일(`lib/site.ts` 의 `CONTACT_EMAIL`)은 실제로 받을 수 있게 연결해 두어야 합니다.
+
 ## 실행
 
 ```bash
