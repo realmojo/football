@@ -150,20 +150,35 @@ export const getSeasonMatches = cache(async (code: string): Promise<Match[]> => 
     }));
 });
 
+// 선수 한글 이름: 선수 소개(한국 선수)와 한글 이름 표를 합친다.
+export const getPlayerNames = cache(async (): Promise<Map<number, string>> => {
+  const [names, profiles] = await Promise.all([
+    supabase.from("football_player_names").select("player_id, name_ko"),
+    supabase.from("football_player_profiles").select("player_id, name_ko"),
+  ]);
+  if (names.error) throw new DataError("db", names.error.message);
+  if (profiles.error) throw new DataError("db", profiles.error.message);
+  return new Map([...(names.data ?? []), ...(profiles.data ?? [])].map((r) => [r.player_id, r.name_ko]));
+});
+
 export const getScorers = cache(async (code: string): Promise<Scorer[]> => {
   const comp = await getCompetition(code);
-  const { data, error } = await supabase
-    .from("football_scorers")
-    .select(`*, team:football_teams(${TEAM_COLUMNS})`)
-    .eq("competition_code", code)
-    .eq("season_id", comp.season_id)
-    .order("goals", { ascending: false })
-    .order("assists", { ascending: false, nullsFirst: false })
-    .order("played_matches", { ascending: true, nullsFirst: false });
+  const [{ data, error }, names] = await Promise.all([
+    supabase
+      .from("football_scorers")
+      .select(`*, team:football_teams(${TEAM_COLUMNS})`)
+      .eq("competition_code", code)
+      .eq("season_id", comp.season_id)
+      .order("goals", { ascending: false })
+      .order("assists", { ascending: false, nullsFirst: false })
+      .order("played_matches", { ascending: true, nullsFirst: false }),
+    getPlayerNames().catch(() => new Map<number, string>()),
+  ]);
   if (error) throw new DataError("db", error.message);
   return (data ?? []).map((r) => ({
     playerId: r.player_id,
-    name: r.player_name,
+    name: names.get(r.player_id) ?? r.player_name,
+    englishName: r.player_name,
     nationality: r.nationality,
     position: r.position,
     team: r.team ? toTeam(r.team as TeamRow) : null,
@@ -528,4 +543,71 @@ export const getArchive = cache(async (league: string, season: number) => {
       }),
     ),
   };
+});
+
+export interface PlayerDetail extends KoreanPlayer {
+  nationality: string | null;
+  korean: boolean;
+}
+
+// 선수 페이지 대상: 소개글이 있는 선수, 한국 국적 선수, 이번 시즌 득점 순위에 있는 선수
+export const getPlayerDetail = cache(async (id: number): Promise<PlayerDetail | null> => {
+  const korean = (await getKoreanPlayers()).find((p) => p.id === id);
+  const [{ data: row, error }, { data: scorers, error: scorerError }, comps, names] = await Promise.all([
+    supabase
+      .from("football_players")
+      .select(`id, name, position, date_of_birth, nationality, team:football_teams(${TEAM_COLUMNS})`)
+      .eq("id", id)
+      .maybeSingle(),
+    supabase
+      .from("football_scorers")
+      .select(`competition_code, season_id, player_name, nationality, position, goals, assists, penalties, played_matches, team:football_teams(${TEAM_COLUMNS})`)
+      .eq("player_id", id),
+    supabase.from("football_competitions").select("code, season_id"),
+    getPlayerNames(),
+  ]);
+  if (error) throw new DataError("db", error.message);
+  if (scorerError) throw new DataError("db", scorerError.message);
+  if (comps.error) throw new DataError("db", comps.error.message);
+  const current = new Map((comps.data ?? []).map((c) => [c.code, c.season_id]));
+  const season = (scorers ?? []).filter((s) => current.get(s.competition_code) === s.season_id && s.competition_code !== "WC");
+  if (!korean && !season.length) return null;
+
+  const first = season[0];
+  const teamRow = (row?.team ?? first?.team) as unknown as TeamRow | null | undefined;
+  const nameEn = row?.name ?? first?.player_name ?? korean?.nameEn ?? null;
+  return {
+    id,
+    nameKo: korean?.nameKo ?? names.get(id) ?? nameEn ?? String(id),
+    nameEn,
+    position: row?.position ?? first?.position ?? korean?.position ?? null,
+    dateOfBirth: row?.date_of_birth ?? korean?.dateOfBirth ?? null,
+    nationality: row?.nationality ?? first?.nationality ?? null,
+    team: teamRow ? toTeam(teamRow) : (korean?.team ?? null),
+    intro: korean?.intro ?? "",
+    korean: !!korean,
+    scoring: season.map((s) => ({
+      competition: s.competition_code,
+      goals: s.goals,
+      assists: s.assists,
+      penalties: s.penalties,
+      playedMatches: s.played_matches,
+    })),
+  };
+});
+
+export interface ScorerEntry extends Scorer {
+  competition: string;
+}
+
+// 모든 대회의 이번 시즌 득점 순위 (월드컵 제외)
+export const getAllScorers = cache(async (): Promise<ScorerEntry[]> => {
+  const lists = await Promise.all(
+    LEAGUES.filter((l) => l.code !== "WC").map((l) =>
+      getScorers(l.code)
+        .then((list) => list.map((s) => ({ ...s, competition: l.code })))
+        .catch(() => [] as ScorerEntry[]),
+    ),
+  );
+  return lists.flat();
 });

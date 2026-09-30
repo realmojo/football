@@ -67,6 +67,8 @@ Cloudflare Workers Builds 설정:
   | `football_team_profiles` | 팀 분석 화면의 구단 소개 | `supabase/seed/football_team_profiles_*.sql` |
 - 해외파 한국 선수(`/korean-players`, `/player/{id}`): 소개글은 `football_player_profiles`(초기 데이터 `supabase/seed/football_player_profiles.sql`),
   소속팀·포지션은 선수단 수집 데이터에서 읽습니다. 소개글이 있는 선수만 페이지가 만들어집니다.
+- 선수 페이지(`/player/{id}`)는 한국 선수와 이번 시즌 득점 순위(대회별 상위 30명)에 있는 모든 선수에게 만들어집니다.
+  득점 선수 모음은 `/players`. 선수 한글 이름은 `football_player_names`(초기 데이터 `supabase/seed/football_player_names.sql`)이고, 없으면 영어 이름을 씁니다.
 - 팀 한글 이름은 `football_teams.name_ko`, `short_name_ko` 에 있습니다(`supabase/seed/football_team_names.sql`). 새 팀이 수집되면 여기에 추가해 주세요. 비어 있으면 영어 이름을 씁니다.
 - 날짜별 해외축구 일정(`/schedule`, `/schedule/{YYYY-MM-DD}`): 모든 대회 경기를 한국시간 날짜로 묶어 보여줍니다.
 - 추가 리그: 챔피언십(ELC), 에레디비시(DED), 프리메이라리가(PPL), 브라질 세리에 A(BSA)는 20분마다 수집합니다(`/leagues`).

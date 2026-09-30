@@ -75,7 +75,9 @@ export interface MatchesResponse {
 
 export interface Scorer {
   playerId: number;
+  // 한글 이름이 있으면 한글, 없으면 원래 이름
   name: string;
+  englishName: string;
   nationality: string | null;
   position: string | null;
   team: Team | null;

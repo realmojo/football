@@ -25,7 +25,7 @@ export function LeagueNav() {
       </a>
       <a
         href="/korean-players"
-        className={pathname === "/korean-players" || pathname.startsWith("/player/") ? "active" : ""}
+        className={pathname === "/korean-players" ? "active" : ""}
       >
         한국 선수
       </a>

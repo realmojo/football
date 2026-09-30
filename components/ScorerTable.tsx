@@ -28,7 +28,9 @@ export function ScorerTable({ scorers, league, compact = false }: { scorers: Sco
             <td className="pos">{scorerRank(scorers, i)}</td>
             <td className="left">
               <div className="player">
-                <strong>{s.name}</strong>
+                <a href={`/player/${s.playerId}`}>
+                  <strong>{s.name}</strong>
+                </a>
                 <span>
                   {compact && s.team ? (s.team.shortName || s.team.name) : `${positionLabel(s.position)} · ${countryLabel(s.nationality)}`}
                 </span>

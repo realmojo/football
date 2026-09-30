@@ -1675,6 +1675,11 @@ article.prose {
   min-width: 0;
 }
 
+.player a:hover strong {
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+
 .player strong {
   font-weight: 700;
   overflow: hidden;

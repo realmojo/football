@@ -3,6 +3,7 @@ import { ARCHIVE_LEAGUES } from "@/lib/archive";
 import {
   getAllSeasonMatches,
   getArchiveSeasons,
+  getAllScorers,
   getArticles,
   getGlossary,
   getH2hIndex,
@@ -29,6 +30,9 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     getH2hIndex().catch(() => []),
   ]);
   const glossary = await getGlossary().catch(() => []);
+  const scorerIds = [...new Set((await getAllScorers().catch(() => [])).map((s) => s.playerId))].filter(
+    (id) => !players.some((p) => p.id === id),
+  );
   const h2hPairs = [...new Set(h2h.map((r) => h2hSlug(r.home_team_id, r.away_team_id)))];
   const dates = matchDates(allMatches);
   const pages: MetadataRoute.Sitemap = [
@@ -41,6 +45,8 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     })),
     { url: `${SITE_URL}/schedule`, lastModified: now, changeFrequency: "hourly", priority: 0.9 },
     { url: `${SITE_URL}/korean-players`, lastModified: now, changeFrequency: "daily", priority: 0.9 },
+    { url: `${SITE_URL}/players`, lastModified: now, changeFrequency: "daily", priority: 0.7 },
+    ...scorerIds.map((id) => ({ url: `${SITE_URL}/player/${id}`, changeFrequency: "daily" as const, priority: 0.5 })),
     ...players.map((p) => ({
       url: `${SITE_URL}/player/${p.id}`,
       lastModified: now,
