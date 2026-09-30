@@ -64,3 +64,35 @@ export interface Match {
 export interface MatchesResponse {
   matches: Match[];
 }
+
+export interface Scorer {
+  playerId: number;
+  name: string;
+  nationality: string | null;
+  position: string | null;
+  team: Team | null;
+  playedMatches: number | null;
+  goals: number;
+  assists: number | null;
+  penalties: number | null;
+}
+
+export interface Player {
+  id: number;
+  name: string;
+  position: string | null;
+  dateOfBirth: string | null;
+  nationality: string | null;
+}
+
+export interface TeamProfile {
+  id: number;
+  founded: number | null;
+  venue: string | null;
+  clubColors: string | null;
+  website: string | null;
+  address: string | null;
+  coachName: string | null;
+  coachNationality: string | null;
+  squad: Player[];
+}

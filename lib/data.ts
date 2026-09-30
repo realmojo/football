@@ -1,7 +1,7 @@
 import "server-only";
 import { cache } from "react";
 import { createClient } from "@supabase/supabase-js";
-import type { Match, MatchStatus, Standing, StandingsResponse, Team } from "./types";
+import type { Match, MatchStatus, Player, Scorer, Standing, StandingsResponse, Team, TeamProfile } from "./types";
 
 // 화면은 football-data.org 를 직접 호출하지 않고, Supabase football-sync 가 모아둔 데이터를 읽는다.
 const supabase = createClient(
@@ -121,4 +121,64 @@ export const getSeasonMatches = cache(async (code: string): Promise<Match[]> => 
         halfTime: { home: m.home_half, away: m.away_half },
       },
     }));
+});
+
+const TEAM_COLUMNS = "id, name, short_name, tla, crest";
+
+export const getScorers = cache(async (code: string): Promise<Scorer[]> => {
+  const comp = await getCompetition(code);
+  const { data, error } = await supabase
+    .from("football_scorers")
+    .select(`*, team:football_teams(${TEAM_COLUMNS})`)
+    .eq("competition_code", code)
+    .eq("season_id", comp.season_id)
+    .order("goals", { ascending: false })
+    .order("assists", { ascending: false, nullsFirst: false })
+    .order("played_matches", { ascending: true, nullsFirst: false });
+  if (error) throw new DataError("db", error.message);
+  return (data ?? []).map((r) => ({
+    playerId: r.player_id,
+    name: r.player_name,
+    nationality: r.nationality,
+    position: r.position,
+    team: r.team ? toTeam(r.team as TeamRow) : null,
+    playedMatches: r.played_matches,
+    goals: r.goals,
+    assists: r.assists,
+    penalties: r.penalties,
+  }));
+});
+
+// 팀 상세 정보와 선수단. 아직 수집 전이면 null.
+export const getTeamProfile = cache(async (teamId: number): Promise<TeamProfile | null> => {
+  const [{ data: team, error }, { data: players, error: playerError }] = await Promise.all([
+    supabase
+      .from("football_teams")
+      .select("id, founded, venue, club_colors, website, address, coach_name, coach_nationality, squad_synced_at")
+      .eq("id", teamId)
+      .maybeSingle(),
+    supabase.from("football_players").select("id, name, position, date_of_birth, nationality").eq("team_id", teamId),
+  ]);
+  if (error) throw new DataError("db", error.message);
+  if (playerError) throw new DataError("db", playerError.message);
+  if (!team || !team.squad_synced_at) return null;
+  return {
+    id: team.id,
+    founded: team.founded,
+    venue: team.venue,
+    clubColors: team.club_colors,
+    website: team.website,
+    address: team.address,
+    coachName: team.coach_name,
+    coachNationality: team.coach_nationality,
+    squad: (players ?? []).map(
+      (p): Player => ({
+        id: p.id,
+        name: p.name,
+        position: p.position,
+        dateOfBirth: p.date_of_birth,
+        nationality: p.nationality,
+      }),
+    ),
+  };
 });

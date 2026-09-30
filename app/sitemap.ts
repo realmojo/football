@@ -22,6 +22,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     pages.push(
       { url: `${SITE_URL}/${l.code}`, lastModified: now, changeFrequency: "hourly", priority: 0.9 },
       { url: `${SITE_URL}/${l.code}/matches`, lastModified: now, changeFrequency: "hourly", priority: 0.8 },
+      { url: `${SITE_URL}/${l.code}/scorers`, lastModified: now, changeFrequency: "hourly", priority: 0.8 },
     );
     const standings = await getStandings(l.code).catch(() => null);
     const teamIds = new Set(standings?.standings.flatMap((s) => s.table.map((r) => r.team.id)) ?? []);

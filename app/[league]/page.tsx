@@ -1,9 +1,10 @@
 import { ErrorBox } from "@/components/ErrorBox";
 import { FormString } from "@/components/Form";
 import { MatchRow } from "@/components/MatchRow";
+import { ScorerTable } from "@/components/ScorerTable";
 import { TeamLabel } from "@/components/TeamLabel";
 import { computeTable, isFinished, isLive, isUpcoming, recentForm } from "@/lib/analysis";
-import { getSeasonMatches, getStandings } from "@/lib/data";
+import { getScorers, getSeasonMatches, getStandings } from "@/lib/data";
 import { findLeague, ZONE_LABEL, zoneFor, zonesOf } from "@/lib/leagues";
 import type { Match, Standing, StandingsResponse } from "@/lib/types";
 
@@ -26,10 +27,12 @@ export default async function StandingsPage({
   const code = info.code;
   const current = VIEWS.find((v) => v.key === view) ?? VIEWS[0];
 
-  const [standingsResult, matchesResult] = await Promise.allSettled([
+  const [standingsResult, matchesResult, scorersResult] = await Promise.allSettled([
     getStandings(code),
     getSeasonMatches(code),
+    getScorers(code),
   ]);
+  const topScorers = scorersResult.status === "fulfilled" ? scorersResult.value.slice(0, 5) : [];
 
   return (
     <div className="split">
@@ -71,6 +74,14 @@ export default async function StandingsPage({
       </section>
 
       <aside className="rail">
+        {topScorers.length ? (
+          <div className="block">
+            <h3 className="block-title">
+              득점 TOP 5 <a href={`/${code}/scorers`}>전체 →</a>
+            </h3>
+            <ScorerTable scorers={topScorers} league={code} compact />
+          </div>
+        ) : null}
         {matchesResult.status === "fulfilled" ? (
           <MatchesSummary matches={matchesResult.value} league={code} />
         ) : (

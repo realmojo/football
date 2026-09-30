@@ -1126,3 +1126,158 @@ table.standings {
     font-size: 24px;
   }
 }
+
+/* ── 득점 순위 · 선수단 ─────────────────────────── */
+
+.player {
+  display: flex;
+  flex-direction: column;
+  line-height: 1.25;
+  min-width: 0;
+}
+
+.player strong {
+  font-weight: 700;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.player span {
+  font-size: 11px;
+  color: var(--ink-3);
+}
+
+.scorers td,
+.squad td {
+  height: 46px;
+}
+
+.block-title a {
+  float: right;
+  font-size: 12px;
+  font-weight: 700;
+  color: var(--ink-3);
+}
+
+.block-title a:hover {
+  color: var(--ink);
+}
+
+.rail .scorers {
+  background: var(--surface);
+}
+
+.leaders {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  border-top: 3px solid var(--rule);
+  background: var(--surface);
+  margin-bottom: 28px;
+}
+
+.leaders div {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  padding: 14px 16px;
+}
+
+.leaders div + div {
+  border-left: 1px solid var(--line);
+}
+
+.leaders span {
+  font-size: 11px;
+  font-weight: 800;
+  color: var(--ink-3);
+}
+
+.leaders strong {
+  font-size: 22px;
+  font-weight: 900;
+  letter-spacing: -0.04em;
+}
+
+.leaders em {
+  font-style: normal;
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--ink-2);
+}
+
+.info-list {
+  margin: 0;
+  background: var(--surface);
+}
+
+.info-list div {
+  display: grid;
+  grid-template-columns: 110px minmax(0, 1fr);
+  gap: 12px;
+  padding: 10px 12px;
+  border-bottom: 1px solid var(--line-2);
+}
+
+.info-list dt {
+  font-size: 12px;
+  font-weight: 700;
+  color: var(--ink-3);
+}
+
+.info-list dd {
+  margin: 0;
+  font-weight: 600;
+  overflow-wrap: anywhere;
+}
+
+.info-list a {
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+
+.squad {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 20px 32px;
+  margin-top: 12px;
+}
+
+.squad-group h4 {
+  font-size: 12px;
+  font-weight: 800;
+  color: var(--ink-2);
+  padding-bottom: 6px;
+  border-bottom: 1px solid var(--ink);
+}
+
+.squad .standings {
+  background: var(--surface);
+}
+
+@media (max-width: 900px) {
+  .squad {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}
+
+@media (max-width: 640px) {
+  .leaders {
+    grid-template-columns: minmax(0, 1fr);
+  }
+  .leaders div + div {
+    border-left: none;
+    border-top: 1px solid var(--line);
+  }
+}
+
+.squad table {
+  table-layout: fixed;
+}
+
+.squad td:nth-child(1) {
+  width: 55%;
+}
+
+.squad td:nth-child(3) {
+  width: 64px;
+}

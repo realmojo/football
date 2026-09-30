@@ -5,9 +5,10 @@ import { Crest } from "@/components/Crest";
 import { FormBadge } from "@/components/Form";
 import { MatchRow } from "@/components/MatchRow";
 import { analyzeTeam, headToHead, perGame, points, type Record } from "@/lib/analysis";
-import { getSeasonMatches, getStandings } from "@/lib/data";
+import { getScorers, getSeasonMatches, getStandings, getTeamProfile } from "@/lib/data";
+import { age, countryLabel, POSITION_GROUP_LABEL, positionGroup, positionLabel, type PositionGroup } from "@/lib/labels";
 import { findLeague } from "@/lib/leagues";
-import type { Match, TableRow } from "@/lib/types";
+import type { Match, Player, Scorer, TableRow, TeamProfile } from "@/lib/types";
 
 export async function generateMetadata({
   params,
@@ -36,9 +37,18 @@ export default async function TeamPage({ params }: { params: Promise<{ league: s
 
   let matches: Match[];
   let rows: TableRow[] = [];
+  let profile: TeamProfile | null = null;
+  let teamScorers: Scorer[] = [];
   try {
-    const [m, s] = await Promise.all([getSeasonMatches(code), getStandings(code).catch(() => null)]);
+    const [m, s, p, sc] = await Promise.all([
+      getSeasonMatches(code),
+      getStandings(code).catch(() => null),
+      getTeamProfile(id).catch(() => null),
+      getScorers(code).catch(() => []),
+    ]);
     matches = m;
+    profile = p;
+    teamScorers = sc.filter((x) => x.team?.id === id);
     rows = s?.standings.find((st) => st.type === "TOTAL" && st.table.some((r) => r.team.id === id))?.table ?? [];
   } catch (e) {
     return <ErrorBox error={e} />;
@@ -167,6 +177,118 @@ export default async function TeamPage({ params }: { params: Promise<{ league: s
           ))}
         </div>
       ) : null}
+
+      {profile || teamScorers.length ? (
+        <div className="cols">
+          {profile ? <TeamInfo profile={profile} /> : <div />}
+          {teamScorers.length ? (
+            <div className="block">
+              <h3 className="block-title">이번 시즌 득점 (리그 득점 순위 기준)</h3>
+              <table className="standings">
+                <thead>
+                  <tr>
+                    <th className="left">선수</th>
+                    <th>경기</th>
+                    <th className="pts">득점</th>
+                    <th>도움</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {teamScorers.map((sc) => (
+                    <tr key={sc.playerId}>
+                      <td className="left">{sc.name}</td>
+                      <td>{sc.playedMatches ?? "-"}</td>
+                      <td className="pts">{sc.goals}</td>
+                      <td>{sc.assists ?? 0}</td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          ) : null}
+        </div>
+      ) : null}
+
+      {profile && profile.squad.length ? <Squad squad={profile.squad} /> : null}
+    </div>
+  );
+}
+
+function TeamInfo({ profile }: { profile: TeamProfile }) {
+  const rows: Array<[string, React.ReactNode]> = [
+    ["감독", profile.coachName ? `${profile.coachName} (${countryLabel(profile.coachNationality)})` : null],
+    ["홈 경기장", profile.venue],
+    ["창단", profile.founded ? `${profile.founded}년` : null],
+    ["클럽 컬러", profile.clubColors],
+    [
+      "공식 홈페이지",
+      profile.website ? (
+        <a href={profile.website} target="_blank" rel="noopener noreferrer">
+          {profile.website.replace(/^https?:\/\//, "").replace(/\/$/, "")}
+        </a>
+      ) : null,
+    ],
+  ];
+  const shown = rows.filter(([, v]) => v);
+  if (!shown.length) return <div />;
+  return (
+    <div className="block">
+      <h3 className="block-title">팀 정보</h3>
+      <dl className="info-list">
+        {shown.map(([k, v]) => (
+          <div key={k}>
+            <dt>{k}</dt>
+            <dd>{v}</dd>
+          </div>
+        ))}
+      </dl>
+    </div>
+  );
+}
+
+const GROUP_ORDER: PositionGroup[] = ["GK", "DF", "MF", "FW"];
+
+function Squad({ squad }: { squad: Player[] }) {
+  const groups = new Map<PositionGroup | "ETC", Player[]>();
+  for (const p of squad) {
+    const g = positionGroup(p.position) ?? "ETC";
+    groups.set(g, [...(groups.get(g) ?? []), p]);
+  }
+  const order: Array<PositionGroup | "ETC"> = [...GROUP_ORDER, "ETC"];
+  return (
+    <div className="block">
+      <h3 className="block-title">선수단 ({squad.length}명)</h3>
+      <div className="squad">
+        {order
+          .filter((g) => groups.get(g)?.length)
+          .map((g) => (
+            <div key={g} className="squad-group">
+              <h4>{g === "ETC" ? "기타" : POSITION_GROUP_LABEL[g]}</h4>
+              <table className="standings">
+                <tbody>
+                  {groups
+                    .get(g)!
+                    .sort((x, y) => x.name.localeCompare(y.name))
+                    .map((p) => (
+                      <tr key={p.id}>
+                        <td className="left">
+                          <div className="player">
+                            <strong>{p.name}</strong>
+                            {/* 세부 포지션이 있을 때만 표시 (예: 센터백) */}
+                            {g !== "ETC" && positionLabel(p.position) === POSITION_GROUP_LABEL[g] ? null : (
+                              <span>{positionLabel(p.position)}</span>
+                            )}
+                          </div>
+                        </td>
+                        <td className="left">{countryLabel(p.nationality)}</td>
+                        <td>{age(p.dateOfBirth) != null ? `${age(p.dateOfBirth)}세` : "-"}</td>
+                      </tr>
+                    ))}
+                </tbody>
+              </table>
+            </div>
+          ))}
+      </div>
     </div>
   );
 }

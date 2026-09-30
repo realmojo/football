@@ -27,6 +27,8 @@ pg_cron (리그별 10분마다, 1분씩 시차)
 | `football_teams` | 팀 이름, 약자, 로고 | 공개 읽기 |
 | `football_matches` | 경기 일정, 상태, 스코어 | 공개 읽기 |
 | `football_standings` | 순위표 | 공개 읽기 |
+| `football_scorers` | 리그별 득점 순위 상위 30명 | 공개 읽기 |
+| `football_players` | 팀별 선수단 | 공개 읽기 |
 | `football_sync_log` | 수집 기록 (14일 보관) | service_role 전용 |
 
 - 스키마와 스케줄: `supabase/migrations/`
@@ -35,7 +37,8 @@ pg_cron (리그별 10분마다, 1분씩 시차)
 - 수동 수집: `select public.football_sync('PL');`
 - 수집 상태 확인: `select * from football_sync_log order by id desc limit 20;`
 
-무료 플랜은 분당 10회 제한이 있어, 리그마다 1분씩 어긋나게 실행해 분당 2회만 호출합니다.
+무료 플랜은 분당 10회 제한이 있어, 리그마다 1분씩 어긋나게 실행해 분당 3회(순위·경기·득점)만 호출합니다.
+선수단과 팀 정보(감독·경기장 등)는 리그 수집이 없는 6분, 8분에 팀 5개씩 받아오며, 팀마다 하루에 한 번 갱신합니다.
 
 ## Cloudflare 배포 (Workers, OpenNext)
 

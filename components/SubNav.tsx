@@ -7,6 +7,7 @@ export function SubNav({ league }: { league: string }) {
   const tabs = [
     { href: `/${league}`, label: "순위" },
     { href: `/${league}/matches`, label: "일정 · 결과" },
+    { href: `/${league}/scorers`, label: "득점 순위" },
   ];
   return (
     <nav className="subnav">
