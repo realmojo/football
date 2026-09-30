@@ -4,6 +4,7 @@ import {
   getAllSeasonMatches,
   getArchiveSeasons,
   getArticles,
+  getGlossary,
   getH2hIndex,
   getKoreanPlayers,
   getSeasonMatches,
@@ -27,6 +28,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     getArchiveSeasons().catch(() => []),
     getH2hIndex().catch(() => []),
   ]);
+  const glossary = await getGlossary().catch(() => []);
   const h2hPairs = [...new Set(h2h.map((r) => h2hSlug(r.home_team_id, r.away_team_id)))];
   const dates = matchDates(allMatches);
   const pages: MetadataRoute.Sitemap = [
@@ -62,6 +64,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     ...h2hPairs.map((p) => ({ url: `${SITE_URL}/h2h/${p}`, changeFrequency: "weekly" as const, priority: 0.6 })),
     { url: `${SITE_URL}/stats`, lastModified: now, changeFrequency: "daily", priority: 0.7 },
     { url: `${SITE_URL}/glossary`, lastModified: now, changeFrequency: "monthly", priority: 0.5 },
+    ...glossary.map((t) => ({ url: `${SITE_URL}/glossary/${t.slug}`, changeFrequency: "monthly" as const, priority: 0.5 })),
     { url: `${SITE_URL}/articles`, lastModified: now, changeFrequency: "weekly", priority: 0.7 },
     ...articles.map((a) => ({
       url: `${SITE_URL}/articles/${a.slug}`,

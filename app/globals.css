@@ -1,6 +1,7 @@
 /* 토리코리: 스포츠 데이터 신문 스타일. 카드 대신 굵은 괘선과 표로 정보를 나눈다. */
 
 :root {
+  color-scheme: only light;
   --paper: #f5f3ee;
   --surface: #ffffff;
   --ink: #15171a;
@@ -23,20 +24,6 @@
   --z-rel: #d23b2a;
   --z-ko: #1f4fd8;
   --z-out: #c9c5bc;
-}
-
-@media (prefers-color-scheme: dark) {
-  :root {
-    --paper: #111316;
-    --surface: #181b1f;
-    --ink: #ecebe7;
-    --ink-2: #b5b7bb;
-    --ink-3: #7c8087;
-    --rule: #ecebe7;
-    --line: #2b2f35;
-    --line-2: #22262b;
-    --z-out: #4a4e55;
-  }
 }
 
 * {
@@ -499,12 +486,14 @@ table.standings {
 
 .match {
   display: grid;
-  grid-template-columns: 92px minmax(0, 1fr) 64px minmax(0, 1fr);
+  /* 마지막 빈 칸이 왼쪽 시간 칸과 폭을 맞춰 스코어가 줄 한가운데에 오게 한다. */
+  grid-template-columns: 92px minmax(0, 1fr) 64px minmax(0, 1fr) 92px;
   align-items: center;
   gap: 10px;
   padding: 9px 0;
   border-bottom: 1px solid var(--line-2);
   max-width: 680px;
+  margin: 0 auto;
 }
 
 .match-when {
@@ -870,6 +859,12 @@ table.standings {
   font-size: 15px;
   line-height: 1.75;
   color: var(--ink);
+}
+
+/* 글만 있는 페이지(칼럼·용어 사전·소개 등)는 본문을 가운데에 둔다. */
+article.prose {
+  margin-left: auto;
+  margin-right: auto;
 }
 
 .prose header {
@@ -1263,6 +1258,35 @@ table.standings {
   font-size: 12px;
   font-weight: 600;
   color: var(--ink-3);
+}
+
+.glossary-list strong small {
+  margin-left: 8px;
+  font-size: 12px;
+  font-weight: 600;
+  letter-spacing: 0;
+  color: var(--ink-3);
+}
+
+.glossary-body p {
+  font-size: 16px;
+  line-height: 1.85;
+}
+
+.glossary-nav {
+  margin-top: 40px;
+  gap: 8px;
+}
+
+.glossary-nav .glossary-home {
+  font-size: 13px;
+}
+
+/* 글 페이지 안의 버튼 모양 링크는 본문 링크 스타일(파란 밑줄)을 쓰지 않는다. */
+.prose .round-links a,
+.prose .round-nav a {
+  color: var(--ink);
+  text-decoration: none;
 }
 
 /* ── 팀 소개 ─────────────────────────── */

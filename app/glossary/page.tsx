@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { ErrorBox } from "@/components/ErrorBox";
 import { GLOSSARY_CATEGORIES, getGlossary, type GlossaryTerm } from "@/lib/data";
+import { firstSentence, plainText } from "@/lib/glossary";
 import { SITE_URL } from "@/lib/site";
 
 export const dynamic = "force-dynamic";
@@ -32,8 +33,8 @@ export default async function GlossaryPage() {
       "@type": "DefinedTerm",
       name: t.term,
       alternateName: t.english ?? undefined,
-      url: `${SITE_URL}/glossary#${t.slug}`,
-      description: t.body.replace(/<[^>]+>/g, ""),
+      url: `${SITE_URL}/glossary/${t.slug}`,
+      description: plainText(t.body),
     })),
   };
 
@@ -44,7 +45,7 @@ export default async function GlossaryPage() {
         <h1>축구 용어 사전</h1>
         <p className="lead">
           중계와 기사에서 자주 나오지만 막상 설명하려면 어려운 축구 용어를 모았습니다. 규칙과 기록부터 대회 제도, 전술,
-          이적까지 {terms.length}개 용어를 토리코리의 관점을 더해 쉽게 풀었습니다.
+          이적까지 {terms.length}개 용어를 토리코리의 관점을 더해 쉽게 풀었습니다. 궁금한 용어를 눌러 자세한 설명을 보세요.
         </p>
         <nav className="glossary-index">
           {groups.map((g) => (
@@ -57,17 +58,19 @@ export default async function GlossaryPage() {
       {groups.map((g) => (
         <section key={g.category}>
           <h2 id={`cat-${GLOSSARY_CATEGORIES.indexOf(g.category)}`}>{g.category}</h2>
-          <dl className="glossary">
+          <ul className="article-list glossary-list">
             {g.terms.map((t) => (
-              <div key={t.slug}>
-                <dt id={t.slug}>
-                  {t.term}
-                  {t.english ? <small>{t.english}</small> : null}
-                </dt>
-                <dd dangerouslySetInnerHTML={{ __html: t.body }} />
-              </div>
+              <li key={t.slug} id={t.slug}>
+                <a href={`/glossary/${t.slug}`}>
+                  <strong>
+                    {t.term}
+                    {t.english ? <small>{t.english}</small> : null}
+                  </strong>
+                  <p>{firstSentence(t.body)}</p>
+                </a>
+              </li>
             ))}
-          </dl>
+          </ul>
         </section>
       ))}
       <p>
