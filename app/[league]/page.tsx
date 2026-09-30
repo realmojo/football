@@ -4,7 +4,7 @@ import { FormString } from "@/components/Form";
 import { MatchRow } from "@/components/MatchRow";
 import { TeamLabel } from "@/components/TeamLabel";
 import { computeTable, isFinished, isLive, isUpcoming, recentForm } from "@/lib/analysis";
-import { getSeasonMatches, getStandings } from "@/lib/api";
+import { getSeasonMatches, getStandings } from "@/lib/data";
 import { findLeague } from "@/lib/leagues";
 import type { Match, Standing, StandingsResponse } from "@/lib/types";
 

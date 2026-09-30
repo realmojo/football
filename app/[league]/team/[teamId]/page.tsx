@@ -4,7 +4,7 @@ import { Crest } from "@/components/Crest";
 import { FormBadge } from "@/components/Form";
 import { MatchRow } from "@/components/MatchRow";
 import { analyzeTeam, headToHead, perGame, points, type Record } from "@/lib/analysis";
-import { getSeasonMatches, getStandings } from "@/lib/api";
+import { getSeasonMatches, getStandings } from "@/lib/data";
 import { findLeague } from "@/lib/leagues";
 import type { Match, TableRow } from "@/lib/types";
 

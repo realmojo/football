@@ -102,6 +102,10 @@ a {
   object-fit: contain;
 }
 
+.league-head .synced {
+  margin-left: auto;
+}
+
 .league-head h1 {
   margin: 0;
   font-size: 24px;

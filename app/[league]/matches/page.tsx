@@ -2,7 +2,7 @@ import Link from "next/link";
 import { ErrorBox } from "@/components/ErrorBox";
 import { MatchRow } from "@/components/MatchRow";
 import { isUpcoming } from "@/lib/analysis";
-import { getSeasonMatches } from "@/lib/api";
+import { getSeasonMatches } from "@/lib/data";
 import { formatDateHeading } from "@/lib/format";
 import { findLeague } from "@/lib/leagues";
 import type { Match } from "@/lib/types";

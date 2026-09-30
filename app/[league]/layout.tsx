@@ -1,6 +1,7 @@
 import { notFound } from "next/navigation";
 import { Crest } from "@/components/Crest";
 import { SubNav } from "@/components/SubNav";
+import { SyncedAt } from "@/components/SyncedAt";
 import { findLeague, leagueEmblem } from "@/lib/leagues";
 
 export default async function LeagueLayout({
@@ -20,6 +21,7 @@ export default async function LeagueLayout({
         <Crest src={leagueEmblem(info.code)} tla={info.code} size={32} />
         <h1>{info.name}</h1>
         <span className="muted">{info.country}</span>
+        <SyncedAt code={info.code} />
       </div>
       <SubNav league={info.code} />
       {children}
