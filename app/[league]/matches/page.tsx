@@ -1,3 +1,4 @@
+import type { Metadata } from "next";
 import { ErrorBox } from "@/components/ErrorBox";
 import { MatchRow } from "@/components/MatchRow";
 import { isUpcoming } from "@/lib/analysis";
@@ -5,6 +6,7 @@ import { completedRounds } from "@/lib/insights";
 import { getSeasonMatches } from "@/lib/data";
 import { formatDateHeading } from "@/lib/format";
 import { CUP_STAGES, findLeague, groupLabel, isCup } from "@/lib/leagues";
+import { seasonLabel } from "@/lib/season";
 import type { Match } from "@/lib/types";
 
 // 라운드를 지정하지 않으면 아직 끝나지 않은 가장 가까운 라운드를 보여준다.
@@ -23,6 +25,40 @@ function groupByDate(matches: Match[]) {
     groups.set(key, [...(groups.get(key) ?? []), m]);
   }
   return [...groups.entries()];
+}
+
+export async function generateMetadata({
+  params,
+  searchParams,
+}: {
+  params: Promise<{ league: string }>;
+  searchParams: Promise<{ matchday?: string; stage?: string }>;
+}): Promise<Metadata> {
+  const info = findLeague((await params).league);
+  if (!info) return {};
+  const sp = await searchParams;
+  if (isCup(info)) {
+    const stage = CUP_STAGES.find((s) => s.key === sp.stage);
+    return {
+      title: `${info.country} ${info.name} ${stage ? `${stage.label} ` : ""}경기 결과 · 일정 (한국시간)`,
+      description: `${info.country} ${info.name} ${stage?.label ?? "전체"} 경기 일정과 결과를 한국시간으로 정리했습니다.`,
+      alternates: { canonical: stage ? `/${info.code}/matches?stage=${stage.key}` : `/${info.code}/matches` },
+    };
+  }
+  const season = await seasonLabel(info.code);
+  const day = Number(sp.matchday);
+  if (Number.isInteger(day) && day > 0) {
+    return {
+      title: `${info.name} ${day}라운드 일정 · 결과 (한국시간) · ${season} 시즌`,
+      description: `${season} 시즌 ${info.name} ${day}라운드 전 경기의 킥오프 시간(한국시간)과 스코어를 정리했습니다. 경기가 끝나면 결과와 라운드 리뷰로 이어집니다.`,
+      alternates: { canonical: `/${info.code}/matches?matchday=${day}` },
+    };
+  }
+  return {
+    title: `${season} ${info.name} 경기 일정 · 결과 (한국시간)`.trim(),
+    description: `${season} 시즌 ${info.name} 라운드별 경기 일정과 결과를 한국시간으로 정리했습니다. 지난 라운드 스코어와 다음 라운드 킥오프 시간을 확인하세요.`,
+    alternates: { canonical: `/${info.code}/matches` },
+  };
 }
 
 export default async function MatchesPage({

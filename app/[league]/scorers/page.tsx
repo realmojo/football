@@ -3,14 +3,20 @@ import { ErrorBox } from "@/components/ErrorBox";
 import { ScorerTable } from "@/components/ScorerTable";
 import { getScorers } from "@/lib/data";
 import { findLeague } from "@/lib/leagues";
+import { seasonLabel } from "@/lib/season";
 import type { Scorer } from "@/lib/types";
 
 export async function generateMetadata({ params }: { params: Promise<{ league: string }> }): Promise<Metadata> {
   const info = findLeague((await params).league);
   if (!info) return {};
+  const [season, scorers] = await Promise.all([seasonLabel(info.code), getScorers(info.code).catch(() => [] as Scorer[])]);
+  const top = scorers[0];
   return {
-    title: `${info.name} 득점 순위`,
-    description: `${info.name} 이번 시즌 득점 순위. 선수별 골, 도움, 페널티 골과 경기당 득점을 확인하세요.`,
+    title: `${season} ${info.name} 득점 순위 · 득점왕 경쟁`.trim(),
+    description:
+      `${season} 시즌 ${info.name} 득점 순위.` +
+      (top ? ` 현재 선두는 ${top.name}(${top.goals}골${top.team ? `, ${top.team.shortName}` : ""}).` : "") +
+      ` 선수별 골, 도움, 페널티 골과 경기당 득점을 확인하세요.`,
     alternates: { canonical: `/${info.code}/scorers` },
   };
 }

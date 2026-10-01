@@ -6,6 +6,7 @@ import {
   getArchiveSeasons,
   getAllScorers,
   getArticles,
+  getDerbies,
   getGlossary,
   getH2hIndex,
   getKoreanPlayers,
@@ -31,9 +32,15 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     getH2hIndex().catch(() => []),
   ]);
   const glossary = await getGlossary().catch(() => []);
+  const derbies = await getDerbies().catch(() => []);
   const scorerIds = [...new Set((await getAllScorers().catch(() => [])).map((s) => s.playerId))].filter(
     (id) => !players.some((p) => p.id === id),
   );
+  // 경기 페이지: 끝난 경기와 2주 안에 열리는 경기 (더 먼 경기는 내용이 적어 검색에서 뺀다)
+  const horizon = Date.now() + 14 * 24 * 3600 * 1000;
+  const matchUrls = allMatches
+    .filter((m) => m.status === "FINISHED" || new Date(m.utcDate).getTime() <= horizon)
+    .map((m) => ({ url: `${SITE_URL}/match/${m.id}`, changeFrequency: "daily" as const, priority: 0.5 }));
   const h2hPairs = [...new Set(h2h.map((r) => h2hSlug(r.home_team_id, r.away_team_id)))];
   const dates = matchDates(allMatches);
   const pages: MetadataRoute.Sitemap = [
@@ -68,8 +75,11 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
         changeFrequency: "yearly" as const,
         priority: 0.6,
       })),
+    ...matchUrls,
     ...h2hPairs.map((p) => ({ url: `${SITE_URL}/h2h/${p}`, changeFrequency: "weekly" as const, priority: 0.6 })),
     { url: `${SITE_URL}/stats`, lastModified: now, changeFrequency: "daily", priority: 0.7 },
+    { url: `${SITE_URL}/derby`, lastModified: now, changeFrequency: "weekly", priority: 0.6 },
+    ...derbies.map((d) => ({ url: `${SITE_URL}/derby/${d.slug}`, changeFrequency: "weekly" as const, priority: 0.6 })),
     { url: `${SITE_URL}/glossary`, lastModified: now, changeFrequency: "monthly", priority: 0.5 },
     ...glossary.map((t) => ({ url: `${SITE_URL}/glossary/${t.slug}`, changeFrequency: "monthly" as const, priority: 0.5 })),
     { url: `${SITE_URL}/articles`, lastModified: now, changeFrequency: "weekly", priority: 0.7 },

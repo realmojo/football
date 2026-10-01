@@ -17,6 +17,7 @@ import {
 } from "@/lib/insights";
 import { DOMESTIC_LEAGUES, findLeague, isCup } from "@/lib/leagues";
 import { leagueParagraphs } from "@/lib/narrative";
+import { seasonLabel } from "@/lib/season";
 
 export const dynamic = "force-dynamic";
 
@@ -26,7 +27,7 @@ export async function generateMetadata({ params }: { params: Params }): Promise<
   const info = findLeague((await params).league);
   if (!info || isCup(info)) return {};
   return {
-    title: `${info.name} 시즌 통계 · 팀별 득실점, 홈·원정, 전후반 분석`,
+    title: `${await seasonLabel(info.code)} ${info.name} 시즌 통계 · 팀별 득실점, 홈·원정, 전후반 분석`.trim(),
     description: `${info.name} 이번 시즌 경기당 골, 홈·원정 승률, 2.5골 오버와 양팀 득점 비율, 팀별 전반·후반 득실점과 역전 승점, 자주 나온 스코어를 분석합니다.`,
     alternates: { canonical: `/${info.code}/stats` },
   };

@@ -1,3 +1,4 @@
+import type { Metadata } from "next";
 import { ErrorBox } from "@/components/ErrorBox";
 import { FormString } from "@/components/Form";
 import { MatchRow } from "@/components/MatchRow";
@@ -7,6 +8,7 @@ import { TeamLabel } from "@/components/TeamLabel";
 import { computeTable, isFinished, isLive, isUpcoming, recentForm } from "@/lib/analysis";
 import { getScorers, getSeasonMatches, getStandings } from "@/lib/data";
 import { findLeague, isCup, ZONE_LABEL, zoneFor, zonesOf } from "@/lib/leagues";
+import { seasonLabel } from "@/lib/season";
 import type { Match, Standing, StandingsResponse } from "@/lib/types";
 
 const VIEWS = [
@@ -14,6 +16,29 @@ const VIEWS = [
   { key: "home", type: "HOME", label: "홈" },
   { key: "away", type: "AWAY", label: "원정" },
 ] as const;
+
+export async function generateMetadata({ params }: { params: Promise<{ league: string }> }): Promise<Metadata> {
+  const info = findLeague((await params).league);
+  if (!info) return {};
+  if (isCup(info)) {
+    return {
+      title: `${info.country} ${info.name} 조별리그 순위 · 경기 결과`,
+      description: `${info.country} ${info.name} 조별리그 순위, 토너먼트 대진표, 전 경기 결과와 득점 순위.`,
+      alternates: { canonical: `/${info.code}` },
+    };
+  }
+  const [season, standings] = await Promise.all([seasonLabel(info.code), getStandings(info.code).catch(() => null)]);
+  const table = standings?.standings.find((s) => s.type === "TOTAL")?.table ?? [];
+  const leader = table[0];
+  return {
+    title: `${season} ${info.name} 순위 · 승점 · 최근 5경기`.trim(),
+    description:
+      `${season} 시즌 ${info.name} 순위표.` +
+      (leader ? ` 현재 1위 ${leader.team.name}(승점 ${leader.points}, ${leader.playedGames}경기).` : "") +
+      ` 전체·홈·원정 순위와 최근 5경기, 유럽대항전 진출권과 강등권을 한눈에 볼 수 있습니다.`,
+    alternates: { canonical: `/${info.code}` },
+  };
+}
 
 export default async function StandingsPage({
   params,

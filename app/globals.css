@@ -1512,6 +1512,62 @@ article.prose {
   text-decoration: none;
 }
 
+/* ── 경기 페이지 ─────────────────────────── */
+
+a.scorebox:hover b,
+a.scorebox:hover span {
+  outline: 2px solid var(--signal);
+}
+
+.match-center {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+  text-align: center;
+}
+
+.match-score {
+  font-size: 34px;
+  font-weight: 900;
+  letter-spacing: -0.03em;
+  line-height: 1;
+}
+
+.match-center span {
+  font-size: 12px;
+  color: var(--ink-3);
+}
+
+.match-center small {
+  font-size: 12px;
+  font-weight: 700;
+  color: var(--ink-2);
+}
+
+.form-compare {
+  display: grid;
+  gap: 10px;
+  padding: 10px 0 18px;
+}
+
+.form-compare > div {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.derby-title {
+  display: flex !important;
+  align-items: center;
+  gap: 8px;
+}
+
+.match-score.derby-name {
+  font-size: 26px;
+}
+
 /* ── 팀 소개 ─────────────────────────── */
 
 .team-intro {

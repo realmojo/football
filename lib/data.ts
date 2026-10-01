@@ -618,3 +618,31 @@ export const getAllScorers = cache(async (): Promise<ScorerEntry[]> => {
   );
   return lists.flat();
 });
+
+export interface Derby {
+  slug: string;
+  name: string;
+  english: string | null;
+  league: string;
+  teamA: number;
+  teamB: number;
+  // 신뢰할 수 있는 HTML 문단
+  intro: string;
+}
+
+export const getDerbies = cache(async (): Promise<Derby[]> => {
+  const { data, error } = await supabase
+    .from("football_derbies")
+    .select("slug, name, english, league, team_a, team_b, intro")
+    .order("sort");
+  if (error) throw new DataError("db", error.message);
+  return (data ?? []).map((d) => ({
+    slug: d.slug,
+    name: d.name,
+    english: d.english,
+    league: d.league,
+    teamA: d.team_a,
+    teamB: d.team_b,
+    intro: d.intro,
+  }));
+});

@@ -88,6 +88,7 @@ export const MENU: MenuItem[] = [
       {
         links: [
           { href: "/articles", label: "축구 칼럼" },
+          { href: "/derby", label: "더비·라이벌전" },
           { href: "/glossary", label: "축구 용어 사전" },
           { href: "/guide", label: "이용 가이드" },
         ],

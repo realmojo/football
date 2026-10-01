@@ -375,7 +375,27 @@ async function syncH2h(limit: number, token: string) {
   const { data: have, error: haveError } = await supabase.from("football_h2h").select("match_id").in("match_id", ids);
   if (haveError) throw new Error(`맞대결 조회 실패: ${haveError.message}`);
   const done = new Set((have ?? []).map((h) => h.match_id));
-  const targets = (upcoming ?? []).filter((m) => !done.has(m.id)).slice(0, limit);
+
+  // 더비는 날짜와 상관없이 다음 맞대결의 기록을 먼저 받는다 (더비 페이지에 쓴다).
+  const derbyFirst: Array<{ id: number; home_team_id: number; away_team_id: number }> = [];
+  const { data: derbies } = await supabase.from("football_derbies").select("team_a, team_b");
+  for (const d of derbies ?? []) {
+    const { data: next } = await supabase
+      .from("football_matches")
+      .select("id, home_team_id, away_team_id")
+      .in("status", ["SCHEDULED", "TIMED"])
+      .or(`and(home_team_id.eq.${d.team_a},away_team_id.eq.${d.team_b}),and(home_team_id.eq.${d.team_b},away_team_id.eq.${d.team_a})`)
+      .order("utc_date")
+      .limit(1);
+    const m = next?.[0];
+    if (!m) continue;
+    const { data: got } = await supabase.from("football_h2h").select("match_id").eq("match_id", m.id).limit(1);
+    if (!got?.length) derbyFirst.push(m);
+  }
+  const targets = [...derbyFirst, ...(upcoming ?? []).filter((m) => !done.has(m.id) && !derbyFirst.some((x) => x.id === m.id))].slice(
+    0,
+    limit,
+  );
 
   const saved: number[] = [];
   for (const t of targets) {

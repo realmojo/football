@@ -33,7 +33,7 @@ export function MatchRow({ match, league, showDate = false }: { match: Match; le
       <div className={`match-side home${winner === "HOME_TEAM" ? " won" : ""}`}>
         <TeamLabel team={match.homeTeam} league={league} short />
       </div>
-      <div className="scorebox">
+      <a href={`/match/${match.id}`} className="scorebox" aria-label={`${match.homeTeam.name} 대 ${match.awayTeam.name} 경기 정보`}>
         {done || live ? (
           <>
             <b>{home ?? 0}</b>
@@ -43,7 +43,7 @@ export function MatchRow({ match, league, showDate = false }: { match: Match; le
         ) : (
           <span>{formatTime(match.utcDate)}</span>
         )}
-      </div>
+      </a>
       <div className={`match-side away${winner === "AWAY_TEAM" ? " won" : ""}`}>
         <TeamLabel team={match.awayTeam} league={league} short />
       </div>
