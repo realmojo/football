@@ -26,7 +26,8 @@ export async function generateMetadata({ params }: { params: Params }): Promise<
   const data = await load(params).catch(() => null);
   if (!data) return {};
   const { term } = data;
-  const text = plainText(term.body);
+  // 첫 문단(정의)을 설명으로 쓴다.
+  const text = plainText(term.body.split("\n\n")[0]);
   return {
     title: `${term.term}${term.english ? `(${term.english})` : ""} 뜻 · 축구 용어 사전`,
     description: text.length > 150 ? `${text.slice(0, 147)}...` : text,
@@ -67,7 +68,16 @@ export default async function GlossaryTermPage({ params }: { params: Params }) {
         <h1>{term.term}</h1>
         {term.english ? <p className="lead">{term.english}</p> : null}
       </header>
-      <div className="glossary-body" dangerouslySetInnerHTML={{ __html: `<p>${term.body}</p>` }} />
+      {/* 본문은 빈 줄로 나눈 문단들이다. 첫 문단은 정의, 이어지는 문단은 예시·유래·관련 규칙. */}
+      <div
+        className="glossary-body"
+        dangerouslySetInnerHTML={{
+          __html: term.body
+            .split("\n\n")
+            .map((para) => `<p>${para}</p>`)
+            .join(""),
+        }}
+      />
 
       {related.length ? (
         <aside className="article-more">

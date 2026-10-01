@@ -1,6 +1,7 @@
 import type { MetadataRoute } from "next";
 import { ARCHIVE_LEAGUES } from "@/lib/archive";
 import {
+  getTeamIntroIds,
   getAllSeasonMatches,
   getArchiveSeasons,
   getAllScorers,
@@ -80,6 +81,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     })),
   ];
 
+  const introIds = await getTeamIntroIds().catch(() => new Set<number>());
   for (const l of LEAGUES) {
     pages.push(
       { url: `${SITE_URL}/${l.code}`, lastModified: now, changeFrequency: "hourly", priority: 0.9 },
@@ -103,6 +105,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
       }
     }
     for (const id of teamIds) {
+      if (!introIds.has(id)) continue;
       pages.push({ url: `${SITE_URL}/${l.code}/team/${id}`, lastModified: now, changeFrequency: "daily", priority: 0.6 });
     }
   }

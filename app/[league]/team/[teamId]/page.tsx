@@ -39,6 +39,8 @@ export async function generateMetadata({
     title: `${team.name}${team.englishName && team.englishName !== team.name ? ` (${team.englishName})` : ""} 일정 · 결과 · 분석 - ${info.name}`,
     description: `${team.name}${intro?.nickname ? `(${intro.nickname})` : ""}의 구단 소개와 이번 시즌 성적, 최근 5경기 폼, 홈·원정 기록, 다음 경기 프리뷰.`,
     alternates: { canonical: `/${info.code}/team/${id}` },
+    // 구단 소개 글이 아직 없는 팀은 기록 표만 있어 검색에는 내보내지 않는다. (링크는 따라가도록 둔다)
+    robots: intro ? undefined : { index: false, follow: true },
   };
 }
 

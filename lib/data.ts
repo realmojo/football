@@ -304,6 +304,13 @@ export const getTeamIntro = cache(async (teamId: number): Promise<TeamIntro | nu
   return data;
 });
 
+// 구단 소개 글이 있는 팀. 소개 글이 없는 팀 페이지는 검색 노출과 사이트맵에서 뺀다.
+export const getTeamIntroIds = cache(async (): Promise<Set<number>> => {
+  const { data, error } = await supabase.from("football_team_profiles").select("team_id");
+  if (error) throw new DataError("db", error.message);
+  return new Set((data ?? []).map((r) => r.team_id as number));
+});
+
 // 모든 대회의 이번 시즌 경기를 대회 코드와 함께 모은다. 수집 전인 대회는 건너뛴다.
 export const getAllSeasonMatches = cache(async (): Promise<Match[]> => {
   const lists = await Promise.all(
