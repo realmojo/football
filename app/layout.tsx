@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 import Image from "next/image";
-import { LeagueNav } from "@/components/LeagueNav";
+import { MenuBar } from "@/components/MenuBar";
 import { ADSENSE_CLIENT } from "@/lib/site";
 import "./globals.css";
 
@@ -59,7 +59,7 @@ gtag('config', 'G-XZ0HSLNP7B');`,
               <Image src="/brand/toricori-logo.png" alt="" width={36} height={36} className="brand-mark" unoptimized loading="eager" />
               <span className="brand-wordmark">토리코리<small>TORICORI</small></span>
             </a>
-            <LeagueNav />
+            <MenuBar />
           </div>
         </header>
         <main className="container page">{children}</main>
