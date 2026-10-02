@@ -19,6 +19,11 @@ export async function generateMetadata({ params }: { params: Promise<{ slug: str
       description: article.description,
       publishedTime: article.publishedAt,
       modifiedTime: article.updatedAt,
+      url: `/articles/${article.slug}`,
+      siteName: "토리코리",
+      locale: "ko_KR",
+      // 하위 페이지에서 openGraph 를 직접 정하면 루트의 공유 이미지가 이어지지 않으므로 다시 지정한다.
+      images: [{ url: "/opengraph-image.png", width: 1200, height: 630, alt: "토리코리 - 해외축구 순위, 일정, 결과 분석" }],
     },
   };
 }

@@ -184,9 +184,9 @@ export default async function DerbyPage({ params }: { params: Params }) {
         <table className="standings compare">
           <thead>
             <tr>
-              <th>{A.shortName}</th>
-              <th />
-              <th>{B.shortName}</th>
+              <th scope="col">{A.shortName}</th>
+              <td />
+              <th scope="col">{B.shortName}</th>
             </tr>
           </thead>
           <tbody>

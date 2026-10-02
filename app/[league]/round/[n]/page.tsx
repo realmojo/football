@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
+import { Breadcrumbs } from "@/components/Breadcrumbs";
 import { ErrorBox } from "@/components/ErrorBox";
 import { MatchRow } from "@/components/MatchRow";
 import { Stat } from "@/components/Stat";
@@ -75,6 +76,13 @@ export default async function RoundPage({ params }: { params: Params }) {
 
   return (
     <section className="review">
+      <Breadcrumbs
+        items={[
+          { name: info.name, href: `/${code}` },
+          { name: "일정 · 결과", href: `/${code}/matches?matchday=${matchday}` },
+          { name: `${matchday}라운드 리뷰` },
+        ]}
+      />
       <div className="round-nav">
         {prev != null ? <a href={`/${code}/round/${prev}`}>← {prev}라운드 리뷰</a> : <span />}
         <strong>
@@ -155,15 +163,15 @@ export default async function RoundPage({ params }: { params: Params }) {
           <table className="standings">
             <thead>
               <tr>
-                <th className="pos">#</th>
-                <th>변동</th>
-                <th className="left">팀</th>
-                <th>경기</th>
-                <th>승</th>
-                <th>무</th>
-                <th>패</th>
-                <th>득실</th>
-                <th className="pts">승점</th>
+                <th scope="col" className="pos">#</th>
+                <th scope="col">변동</th>
+                <th scope="col" className="left">팀</th>
+                <th scope="col">경기</th>
+                <th scope="col">승</th>
+                <th scope="col">무</th>
+                <th scope="col">패</th>
+                <th scope="col">득실</th>
+                <th scope="col" className="pts">승점</th>
               </tr>
             </thead>
             <tbody>

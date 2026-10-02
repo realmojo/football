@@ -165,13 +165,14 @@ function MiniTable({ code, name, standings }: { code: string; name: string; stan
       </a>
       {table.length ? (
         <table className="standings mini-table">
+          <caption className="sr-only">{name} 상위 순위</caption>
           <thead>
             <tr>
-              <th className="pos">#</th>
-              <th className="left">팀</th>
-              <th>경기</th>
-              <th>득실</th>
-              <th className="pts">승점</th>
+              <th scope="col" className="pos">#</th>
+              <th scope="col" className="left">팀</th>
+              <th scope="col">경기</th>
+              <th scope="col">득실</th>
+              <th scope="col" className="pts">승점</th>
             </tr>
           </thead>
           <tbody>

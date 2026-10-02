@@ -29,16 +29,17 @@ export function GroupStage({ matches, scorers, league }: { matches: Match[]; sco
             <div key={g.group} className="table-wrap">
               <h3 className="group">{groupLabel(g.group)}</h3>
               <table className="standings">
+                <caption className="sr-only">{groupLabel(g.group)} 순위표</caption>
                 <thead>
                   <tr>
-                    <th className="pos">순위</th>
-                    <th className="left">팀</th>
-                    <th>경기</th>
-                    <th>승</th>
-                    <th>무</th>
-                    <th>패</th>
-                    <th>득실</th>
-                    <th className="pts">승점</th>
+                    <th scope="col" className="pos">순위</th>
+                    <th scope="col" className="left">팀</th>
+                    <th scope="col">경기</th>
+                    <th scope="col">승</th>
+                    <th scope="col">무</th>
+                    <th scope="col">패</th>
+                    <th scope="col">득실</th>
+                    <th scope="col" className="pts">승점</th>
                   </tr>
                 </thead>
                 <tbody>
@@ -70,15 +71,16 @@ export function GroupStage({ matches, scorers, league }: { matches: Match[]; sco
             <h3 className="block-title">조 3위 팀 순위 (상위 8팀 32강 진출)</h3>
             <div className="table-wrap">
               <table className="standings">
+                <caption className="sr-only">조 3위 팀 순위표</caption>
                 <thead>
                   <tr>
-                    <th className="pos">순위</th>
-                    <th className="left">팀</th>
-                    <th>조</th>
-                    <th>승점</th>
-                    <th>득실</th>
-                    <th>득점</th>
-                    <th className="left">결과</th>
+                    <th scope="col" className="pos">순위</th>
+                    <th scope="col" className="left">팀</th>
+                    <th scope="col">조</th>
+                    <th scope="col">승점</th>
+                    <th scope="col">득실</th>
+                    <th scope="col">득점</th>
+                    <th scope="col" className="left">결과</th>
                   </tr>
                 </thead>
                 <tbody>

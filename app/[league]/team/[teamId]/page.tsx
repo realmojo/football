@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
+import { Breadcrumbs } from "@/components/Breadcrumbs";
 import { ErrorBox } from "@/components/ErrorBox";
 import { Crest } from "@/components/Crest";
 import { FormBadge } from "@/components/Form";
@@ -19,6 +20,7 @@ import {
 import { age, countryLabel, POSITION_GROUP_LABEL, positionGroup, positionLabel, type PositionGroup } from "@/lib/labels";
 import { findLeague, groupLabel, isCup, stageLabel } from "@/lib/leagues";
 import { teamFinish } from "@/lib/cup";
+import { SITE_URL } from "@/lib/site";
 import type { Match, Player, Scorer, TableRow, TeamProfile } from "@/lib/types";
 
 export async function generateMetadata({
@@ -88,8 +90,24 @@ export default async function TeamPage({ params }: { params: Promise<{ league: s
   const opponentAnalysis = opponent ? analyzeTeam(matches, opponent.id) : null;
   const hasH2h = opponent ? !!(await getH2h(id, opponent.id).catch(() => null)) : false;
 
+  const jsonLd = {
+    "@context": "https://schema.org",
+    "@type": "SportsTeam",
+    name: team.name,
+    alternateName: team.englishName && team.englishName !== team.name ? team.englishName : undefined,
+    sport: "Soccer",
+    url: `${SITE_URL}/${code}/team/${id}`,
+    logo: team.crest || undefined,
+    foundingDate: profile?.founded ? String(profile.founded) : undefined,
+    location: profile?.venue ? { "@type": "Place", name: profile.venue } : undefined,
+    coach: profile?.coachName ? { "@type": "Person", name: profile.coachName } : undefined,
+    memberOf: { "@type": "SportsOrganization", name: info.name, url: `${SITE_URL}/${code}` },
+  };
+
   return (
     <div className="team-page">
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }} />
+      <Breadcrumbs items={[{ name: info.name, href: `/${code}` }, { name: team.name }]} />
       <div className="team-head">
         <Crest src={team.crest} tla={team.tla} size={64} />
         <div>
@@ -169,14 +187,14 @@ export default async function TeamPage({ params }: { params: Promise<{ league: s
           <table className="standings">
             <thead>
               <tr>
-                <th className="left">구분</th>
-                <th>경기</th>
-                <th>승</th>
-                <th>무</th>
-                <th>패</th>
-                <th>득</th>
-                <th>실</th>
-                <th>승점</th>
+                <th scope="col" className="left">구분</th>
+                <th scope="col">경기</th>
+                <th scope="col">승</th>
+                <th scope="col">무</th>
+                <th scope="col">패</th>
+                <th scope="col">득</th>
+                <th scope="col">실</th>
+                <th scope="col">승점</th>
               </tr>
             </thead>
             <tbody>
@@ -214,9 +232,9 @@ export default async function TeamPage({ params }: { params: Promise<{ league: s
           <table className="standings compare">
             <thead>
               <tr>
-                <th>{team.shortName}</th>
-                <th />
-                <th>{opponent.shortName}</th>
+                <th scope="col">{team.shortName}</th>
+                <td />
+                <th scope="col">{opponent.shortName}</th>
               </tr>
             </thead>
             <tbody>
@@ -257,10 +275,10 @@ export default async function TeamPage({ params }: { params: Promise<{ league: s
               <table className="standings">
                 <thead>
                   <tr>
-                    <th className="left">선수</th>
-                    <th>경기</th>
-                    <th className="pts">득점</th>
-                    <th>도움</th>
+                    <th scope="col" className="left">선수</th>
+                    <th scope="col">경기</th>
+                    <th scope="col" className="pts">득점</th>
+                    <th scope="col">도움</th>
                   </tr>
                 </thead>
                 <tbody>

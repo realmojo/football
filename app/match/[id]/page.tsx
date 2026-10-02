@@ -151,9 +151,9 @@ export default async function MatchPage({ params }: { params: Params }) {
           <table className="standings compare">
             <thead>
               <tr>
-                <th>{m.homeTeam.shortName}</th>
-                <th />
-                <th>{m.awayTeam.shortName}</th>
+                <th scope="col">{m.homeTeam.shortName}</th>
+                <td />
+                <th scope="col">{m.awayTeam.shortName}</th>
               </tr>
             </thead>
             <tbody>

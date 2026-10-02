@@ -90,14 +90,14 @@ export default async function LeagueStatsPage({ params }: { params: Params }) {
           <table className="standings">
             <thead>
               <tr>
-                <th className="left">팀</th>
-                <th>경기</th>
-                <th>경기당 득점</th>
-                <th>경기당 실점</th>
-                <th>무실점</th>
-                <th>무득점</th>
-                <th>2.5골 오버</th>
-                <th>양팀 득점</th>
+                <th scope="col" className="left">팀</th>
+                <th scope="col">경기</th>
+                <th scope="col">경기당 득점</th>
+                <th scope="col">경기당 실점</th>
+                <th scope="col">무실점</th>
+                <th scope="col">무득점</th>
+                <th scope="col">2.5골 오버</th>
+                <th scope="col">양팀 득점</th>
               </tr>
             </thead>
             <tbody>
@@ -127,10 +127,10 @@ export default async function LeagueStatsPage({ params }: { params: Params }) {
             <table className="standings">
               <thead>
                 <tr>
-                  <th className="left">팀</th>
-                  <th>홈</th>
-                  <th>원정</th>
-                  <th>차이</th>
+                  <th scope="col" className="left">팀</th>
+                  <th scope="col">홈</th>
+                  <th scope="col">원정</th>
+                  <th scope="col">차이</th>
                 </tr>
               </thead>
               <tbody>
@@ -163,11 +163,11 @@ export default async function LeagueStatsPage({ params }: { params: Params }) {
             <table className="standings">
               <thead>
                 <tr>
-                  <th className="left">팀</th>
-                  <th>전반 득/실</th>
-                  <th>후반 득/실</th>
-                  <th>역전 승점</th>
-                  <th>놓친 승점</th>
+                  <th scope="col" className="left">팀</th>
+                  <th scope="col">전반 득/실</th>
+                  <th scope="col">후반 득/실</th>
+                  <th scope="col">역전 승점</th>
+                  <th scope="col">놓친 승점</th>
                 </tr>
               </thead>
               <tbody>

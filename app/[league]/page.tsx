@@ -9,6 +9,7 @@ import { computeTable, isFinished, isLive, isUpcoming, recentForm } from "@/lib/
 import { getScorers, getSeasonMatches, getStandings } from "@/lib/data";
 import { findLeague, isCup, ZONE_LABEL, zoneFor, zonesOf } from "@/lib/leagues";
 import { seasonLabel } from "@/lib/season";
+import { SITE_URL } from "@/lib/site";
 import type { Match, Standing, StandingsResponse } from "@/lib/types";
 
 const VIEWS = [
@@ -60,10 +61,38 @@ export default async function StandingsPage({
   ]);
   const topScorers = scorersResult.status === "fulfilled" ? scorersResult.value.slice(0, 5) : [];
 
+  // 검색엔진용 구조화 데이터: 리그(대회)와 참가 팀 목록
+  const memberTeams = new Map<number, { name: string; crest?: string | null }>();
+  if (standingsResult.status === "fulfilled") {
+    for (const st of standingsResult.value.standings) {
+      if (st.type !== "TOTAL") continue;
+      for (const r of st.table) memberTeams.set(r.team.id, { name: r.team.name, crest: r.team.crest });
+    }
+  } else if (matchesResult.status === "fulfilled") {
+    for (const m of matchesResult.value)
+      for (const t of [m.homeTeam, m.awayTeam]) if (t.id) memberTeams.set(t.id, { name: t.name, crest: t.crest });
+  }
+  const jsonLd = {
+    "@context": "https://schema.org",
+    "@type": "SportsOrganization",
+    name: info.name,
+    sport: "Soccer",
+    url: `${SITE_URL}/${code}`,
+    areaServed: info.country,
+    member: [...memberTeams].map(([id, t]) => ({
+      "@type": "SportsTeam",
+      name: t.name,
+      url: `${SITE_URL}/${code}/team/${id}`,
+      logo: t.crest || undefined,
+    })),
+  };
+  const ld = <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }} />;
+
   if (isCup(info)) {
     if (matchesResult.status === "rejected") return <ErrorBox error={matchesResult.reason} />;
     return (
       <>
+        {ld}
         <GroupStage
           matches={matchesResult.value}
           scorers={scorersResult.status === "fulfilled" ? scorersResult.value : []}
@@ -76,6 +105,7 @@ export default async function StandingsPage({
 
   return (
     <div className="split">
+      {ld}
       <section>
         <div className="sec-head">
           <h2>순위</h2>
@@ -166,19 +196,23 @@ function StandingsTables({
         <div key={i} className="table-wrap">
           {s.group?.startsWith("GROUP_") ? <h3 className="group">{s.group.replace("GROUP_", "")}조</h3> : null}
           <table className="standings">
+            <caption className="sr-only">
+              {findLeague(league)?.name ?? league} {type === "HOME" ? "홈 " : type === "AWAY" ? "원정 " : ""}순위표
+              {s.group?.startsWith("GROUP_") ? ` ${s.group.replace("GROUP_", "")}조` : ""}
+            </caption>
             <thead>
               <tr>
-                <th className="pos">순위</th>
-                <th className="left">팀</th>
-                <th>경기</th>
-                <th>승</th>
-                <th>무</th>
-                <th>패</th>
-                <th className="hide-sm">득점</th>
-                <th className="hide-sm">실점</th>
-                <th>득실</th>
-                <th className="pts">승점</th>
-                <th className="hide-sm left">최근 5경기</th>
+                <th scope="col" className="pos">순위</th>
+                <th scope="col" className="left">팀</th>
+                <th scope="col">경기</th>
+                <th scope="col">승</th>
+                <th scope="col">무</th>
+                <th scope="col">패</th>
+                <th scope="col" className="hide-sm">득점</th>
+                <th scope="col" className="hide-sm">실점</th>
+                <th scope="col">득실</th>
+                <th scope="col" className="pts">승점</th>
+                <th scope="col" className="hide-sm left">최근 5경기</th>
               </tr>
             </thead>
             <tbody>

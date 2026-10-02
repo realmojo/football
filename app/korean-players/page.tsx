@@ -100,14 +100,14 @@ export default async function KoreanPlayersPage() {
           <table className="standings">
             <thead>
               <tr>
-                <th className="left">선수</th>
-                <th className="left">소속팀</th>
-                <th>포지션</th>
-                <th>나이</th>
-                <th>골</th>
-                <th>도움</th>
-                <th className="left">다음 경기</th>
-                <th className="left">최근 결과</th>
+                <th scope="col" className="left">선수</th>
+                <th scope="col" className="left">소속팀</th>
+                <th scope="col">포지션</th>
+                <th scope="col">나이</th>
+                <th scope="col">골</th>
+                <th scope="col">도움</th>
+                <th scope="col" className="left">다음 경기</th>
+                <th scope="col" className="left">최근 결과</th>
               </tr>
             </thead>
             <tbody>

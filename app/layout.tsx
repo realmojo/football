@@ -1,4 +1,4 @@
-import type { Metadata } from "next";
+import type { Metadata, Viewport } from "next";
 import Image from "next/image";
 import { MenuBar } from "@/components/MenuBar";
 import { ADSENSE_CLIENT } from "@/lib/site";
@@ -23,6 +23,14 @@ export const metadata: Metadata = {
     locale: "ko_KR",
     url: "https://toricori.com",
   },
+  twitter: {
+    card: "summary_large_image",
+  },
+};
+
+export const viewport: Viewport = {
+  themeColor: "#0e1a2b",
+  colorScheme: "light",
 };
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
@@ -33,6 +41,8 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
           rel="stylesheet"
           href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable-dynamic-subset.min.css"
         />
+        {/* 하위 페이지의 alternates(canonical) 설정에 덮이지 않도록 피드 링크는 직접 넣는다. */}
+        <link rel="alternate" type="application/rss+xml" title="토리코리 축구 칼럼" href="/rss.xml" />
         {/* Google tag (gtag.js) */}
         <script async src="https://www.googletagmanager.com/gtag/js?id=G-XZ0HSLNP7B" />
         <script

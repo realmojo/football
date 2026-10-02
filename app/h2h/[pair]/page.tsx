@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
+import { Breadcrumbs } from "@/components/Breadcrumbs";
 import { Crest } from "@/components/Crest";
 import { ErrorBox } from "@/components/ErrorBox";
 import { MatchRow } from "@/components/MatchRow";
@@ -128,6 +129,12 @@ export default async function H2hPage({ params }: { params: Params }) {
 
   return (
     <article className="review">
+      <Breadcrumbs
+        items={[
+          ...(aCode ? [{ name: A.name, href: `/${aCode}/team/${A.id}` }] : []),
+          { name: `${A.shortName} vs ${B.shortName} 상대 전적` },
+        ]}
+      />
       <div className="h2h-head">
         <a href={aCode ? `/${aCode}/team/${A.id}` : "#"} className="h2h-team">
           <Crest src={A.crest} tla={A.tla} size={56} />

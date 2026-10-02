@@ -77,16 +77,16 @@ export default async function StatsPage() {
           <table className="standings">
             <thead>
               <tr>
-                <th className="left">리그</th>
-                <th>경기</th>
-                <th>경기당 골</th>
-                <th>홈 승</th>
-                <th>무승부</th>
-                <th>원정 승</th>
-                <th>2.5골 오버</th>
-                <th>양팀 득점</th>
-                <th>후반 골 비중</th>
-                <th>역전승</th>
+                <th scope="col" className="left">리그</th>
+                <th scope="col">경기</th>
+                <th scope="col">경기당 골</th>
+                <th scope="col">홈 승</th>
+                <th scope="col">무승부</th>
+                <th scope="col">원정 승</th>
+                <th scope="col">2.5골 오버</th>
+                <th scope="col">양팀 득점</th>
+                <th scope="col">후반 골 비중</th>
+                <th scope="col">역전승</th>
               </tr>
             </thead>
             <tbody>
@@ -164,10 +164,10 @@ export default async function StatsPage() {
           <table className="standings">
             <thead>
               <tr>
-                <th className="left">리그</th>
-                <th className="left">경기당 득점 1위 팀</th>
-                <th className="left">득점 선두</th>
-                <th>자세히</th>
+                <th scope="col" className="left">리그</th>
+                <th scope="col" className="left">경기당 득점 1위 팀</th>
+                <th scope="col" className="left">득점 선두</th>
+                <th scope="col">자세히</th>
               </tr>
             </thead>
             <tbody>

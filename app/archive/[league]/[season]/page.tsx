@@ -116,17 +116,17 @@ export default async function ArchiveSeasonPage({ params }: { params: Params }) 
           <table className="standings">
             <thead>
               <tr>
-                <th className="pos">#</th>
-                <th className="left">팀</th>
-                <th>경기</th>
-                <th>승</th>
-                <th>무</th>
-                <th>패</th>
-                <th>득점</th>
-                <th>실점</th>
-                <th>득실</th>
-                <th className="pts">승점</th>
-                <th className="left">비고</th>
+                <th scope="col" className="pos">#</th>
+                <th scope="col" className="left">팀</th>
+                <th scope="col">경기</th>
+                <th scope="col">승</th>
+                <th scope="col">무</th>
+                <th scope="col">패</th>
+                <th scope="col">득점</th>
+                <th scope="col">실점</th>
+                <th scope="col">득실</th>
+                <th scope="col" className="pts">승점</th>
+                <th scope="col" className="left">비고</th>
               </tr>
             </thead>
             <tbody>
@@ -162,13 +162,13 @@ export default async function ArchiveSeasonPage({ params }: { params: Params }) 
             <table className="standings">
               <thead>
                 <tr>
-                  <th className="pos">#</th>
-                  <th className="left">선수</th>
-                  <th className="left">팀</th>
-                  <th>경기</th>
-                  <th className="pts">골</th>
-                  <th>도움</th>
-                  <th>PK</th>
+                  <th scope="col" className="pos">#</th>
+                  <th scope="col" className="left">선수</th>
+                  <th scope="col" className="left">팀</th>
+                  <th scope="col">경기</th>
+                  <th scope="col" className="pts">골</th>
+                  <th scope="col">도움</th>
+                  <th scope="col">PK</th>
                 </tr>
               </thead>
               <tbody>

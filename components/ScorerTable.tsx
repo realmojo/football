@@ -1,3 +1,4 @@
+import { findLeague } from "@/lib/leagues";
 import { countryLabel, positionLabel } from "@/lib/labels";
 import type { Scorer } from "@/lib/types";
 import { TeamLabel } from "./TeamLabel";
@@ -10,16 +11,17 @@ export function scorerRank(list: Scorer[], i: number) {
 export function ScorerTable({ scorers, league, compact = false }: { scorers: Scorer[]; league: string; compact?: boolean }) {
   return (
     <table className="standings scorers">
+      <caption className="sr-only">{findLeague(league)?.name ?? league} 득점 순위</caption>
       <thead>
         <tr>
-          <th className="pos">순위</th>
-          <th className="left">선수</th>
-          {compact ? null : <th className="left hide-sm">팀</th>}
-          {compact ? null : <th>경기</th>}
-          <th className="pts">득점</th>
-          {compact ? null : <th>도움</th>}
-          {compact ? null : <th className="hide-sm">PK</th>}
-          {compact ? null : <th className="hide-sm">경기당</th>}
+          <th scope="col" className="pos">순위</th>
+          <th scope="col" className="left">선수</th>
+          {compact ? null : <th scope="col" className="left hide-sm">팀</th>}
+          {compact ? null : <th scope="col">경기</th>}
+          <th scope="col" className="pts">득점</th>
+          {compact ? null : <th scope="col">도움</th>}
+          {compact ? null : <th scope="col" className="hide-sm">PK</th>}
+          {compact ? null : <th scope="col" className="hide-sm">경기당</th>}
         </tr>
       </thead>
       <tbody>
