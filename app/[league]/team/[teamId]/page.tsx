@@ -163,7 +163,11 @@ export default async function TeamPage({ params }: { params: Promise<{ league: s
               ))}
             </div>
           ) : null}
-          <div dangerouslySetInnerHTML={{ __html: intro.intro }} />
+          {/* 소개 전문은 구단 페이지에 있다. 여기서는 첫 문단만 보여 중복을 피한다. */}
+          <div dangerouslySetInnerHTML={{ __html: intro.intro.split("</p>")[0] + "</p>" }} />
+          <a href={`/club/${id}`} className="h2h-link">
+            {team.name} 구단 소개 전체 보기 →
+          </a>
         </section>
       ) : null}
 

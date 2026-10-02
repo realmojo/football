@@ -6,6 +6,7 @@ import {
   getArchiveSeasons,
   getAllScorers,
   getArticles,
+  getClubs,
   getDerbies,
   getGlossary,
   getH2hIndex,
@@ -33,6 +34,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   ]);
   const glossary = await getGlossary().catch(() => []);
   const derbies = await getDerbies().catch(() => []);
+  const clubs = await getClubs().catch(() => []);
   const scorerIds = [...new Set((await getAllScorers().catch(() => [])).map((s) => s.playerId))].filter(
     (id) => !players.some((p) => p.id === id),
   );
@@ -78,6 +80,8 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     ...matchUrls,
     ...h2hPairs.map((p) => ({ url: `${SITE_URL}/h2h/${p}`, changeFrequency: "weekly" as const, priority: 0.6 })),
     { url: `${SITE_URL}/stats`, lastModified: now, changeFrequency: "daily", priority: 0.7 },
+    { url: `${SITE_URL}/clubs`, lastModified: now, changeFrequency: "weekly", priority: 0.7 },
+    ...clubs.map((c) => ({ url: `${SITE_URL}/club/${c.team.id}`, changeFrequency: "weekly" as const, priority: 0.6 })),
     { url: `${SITE_URL}/derby`, lastModified: now, changeFrequency: "weekly", priority: 0.6 },
     ...derbies.map((d) => ({ url: `${SITE_URL}/derby/${d.slug}`, changeFrequency: "weekly" as const, priority: 0.6 })),
     { url: `${SITE_URL}/glossary`, lastModified: now, changeFrequency: "monthly", priority: 0.5 },

@@ -646,3 +646,20 @@ export const getDerbies = cache(async (): Promise<Derby[]> => {
     intro: d.intro,
   }));
 });
+
+export interface ClubSummary {
+  team: Team;
+  nickname: string | null;
+  tags: string[];
+}
+
+// 구단 소개가 있는 모든 팀
+export const getClubs = cache(async (): Promise<ClubSummary[]> => {
+  const { data, error } = await supabase
+    .from("football_team_profiles")
+    .select(`team_id, nickname, tags, team:football_teams(${TEAM_COLUMNS})`);
+  if (error) throw new DataError("db", error.message);
+  return (data ?? [])
+    .filter((r) => r.team)
+    .map((r) => ({ team: toTeam(r.team as unknown as TeamRow), nickname: r.nickname, tags: r.tags ?? [] }));
+});

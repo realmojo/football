@@ -46,6 +46,7 @@ export const MENU: MenuItem[] = [
         links: [
           ...["ELC", "DED", "PPL", "BSA"].map((c) => ({ href: `/${c}`, label: leagueName(c) })),
           { href: "/leagues", label: "전체 리그 보기 →" },
+          { href: "/clubs", label: "구단 소개 →" },
         ],
       },
     ],

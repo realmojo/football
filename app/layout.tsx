@@ -86,6 +86,7 @@ gtag('config', 'G-XZ0HSLNP7B');`,
                 <a href="/korean-players">해외파 한국 선수</a>
                 <a href="/players">득점 선수</a>
                 <a href="/leagues">전체 리그</a>
+                <a href="/clubs">구단 소개</a>
                 <a href="/archive">시즌 기록실</a>
                 <a href="/articles">축구 칼럼</a>
                 <a href="/stats">5대 리그 통계</a>
